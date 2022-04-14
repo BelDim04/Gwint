@@ -1,5 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "Class_Game.h"
+#include "Class_Card.h"
+
 class Animation{
 public:
     sf::RenderWindow& window;
@@ -179,4 +182,4 @@ void main_cycle(Game& game){
         window.display();
     }
 }
-/* Amount of strength в Card, вызывать choosecard отдельно
+// Amount of strength в Card, вызывать choosecard отдельно
