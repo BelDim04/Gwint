@@ -54,7 +54,7 @@ public:
 };
 
 
-class Spy_card : Strength_card {
+class Spy_card : public Strength_card {
 public:
 
     Spy_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
@@ -66,7 +66,7 @@ public:
     void delete_card(Game& game) override;
 };
 
-class Healing_card : Strength_card {
+class Healing_card : public Strength_card {
 public:
 
     Healing_card(int Amount_of_strength, bool Can_be_changed,
@@ -79,7 +79,7 @@ public:
     void delete_card(Game& game) override;
 };
 
-class One_increase_card : Strength_card {
+class One_increase_card : public Strength_card {
 public:
 
     One_increase_card(int Amount_of_strength, bool Can_be_changed,
@@ -92,7 +92,7 @@ public:
     void delete_card(Game& game) override;
 };
 
-class Double_increase_card : Strength_card {
+class Double_increase_card : public Strength_card {
 public:
 
     Double_increase_card(int Amount_of_strength, bool Can_be_changed,
