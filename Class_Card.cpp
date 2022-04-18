@@ -4,6 +4,16 @@
 #include "Class_Card.h"
 #include "Class_Game.h"
 
+void deletefunction(Game& game, Card& card) {
+    int n = game.find_vector(card.where_lies).size();
+    for(int i = 0; i < n; ++i) {
+        if(game.find_vector(card.where_lies)[i].name == card.name) {
+            game.find_vector(card.where_lies).erase(game.find_vector(card.where_lies).begin()+i);
+            break;
+        }
+    }
+}
+
 Card::Card(std::string Name, std::string Filename_of_image) : name(Name), filename_of_image(Filename_of_image) {}
 
 void Card::set_where_lies(Game &game) {
@@ -21,6 +31,10 @@ void Card::use_special_ability(Game &game) {
 int Card::recalculate(Game &game) {
     return 0;
 }
+
+void Card::delete_card(Game &game) {
+
+}
 //......................................................................................Силовые карты.....................................................................................//
 
 Strength_card::Strength_card(int Amount_of_strength, bool Can_be_changed,
@@ -30,16 +44,16 @@ Strength_card::Strength_card(int Amount_of_strength, bool Can_be_changed,
 
 int Strength_card::recalculate(Game& game) {
     if (can_be_changed) {
-    std::pair<int&, int&> buffers = game.find_buffer(where_lies);
+        std::pair<int&, int&> buffers = game.find_buffer(where_lies);
 
-    amount_of_strength_now += buffers.first;
-    amount_of_strength_now *= buffers.second;
-    basic_strength += buffers.first;
-    basic_strength *= buffers.second;
+        amount_of_strength_now += buffers.first;
+        amount_of_strength_now *= buffers.second;
+        basic_strength += buffers.first;
+        basic_strength *= buffers.second;
 
-    if (game.is_weather_bad(where_lies)) {//смотрим плохая ли погода
-        amount_of_strength_now = basic_strength;
-    }
+        if (game.is_weather_bad(where_lies)) {//смотрим плохая ли погода
+            amount_of_strength_now = basic_strength;
+        }
     }
     return amount_of_strength_now;
 }
@@ -56,6 +70,10 @@ void Strength_card::bot_set_where_lies(Game &game) {
     Card::bot_set_where_lies(game);
 }
 
+void Strength_card::delete_card(Game &game) {
+    Card::delete_card(game);
+}
+
 
 Usual_card::Usual_card(int Amount_of_strength, bool Can_be_changed,
                        std::string Name, std::string Filename_of_image, std::string Type_of_weapon) :
@@ -70,6 +88,10 @@ void Usual_card::set_where_lies(Game &game) {
 }
 void Usual_card::bot_set_where_lies(Game &game) {
     set_where_lies(game);
+}
+
+void Usual_card::delete_card(Game &game) {
+    deletefunction(game, *this);
 }
 
 Spy_card::Spy_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
@@ -94,6 +116,9 @@ void Spy_card::use_special_ability(Game& game){
     game.spy_move(a, b);
 }
 
+void Spy_card::delete_card(Game &game) {
+    deletefunction(game, *this);
+}
 
 Healing_card::Healing_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
                            std::string Filename_of_image, std::string Type_of_weapon) :
@@ -113,9 +138,12 @@ void Healing_card::use_special_ability(Game& game) {
     std::vector<Card>& reset = game.now_moving().reset;
     if (reset.size()) {
         int a = rand() % reset.size();
-        game.
-        healing_move(a);
+        game.healing_move(a);
     }
+}
+
+void Healing_card::delete_card(Game &game) {
+    deletefunction(game, *this);
 }
 
 One_increase_card::One_increase_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
@@ -136,6 +164,13 @@ void One_increase_card::use_special_ability(Game& game) {
     buffers.first += 1;
 }
 
+void One_increase_card::delete_card(Game &game) {
+    deletefunction(game, *this);
+    std::pair<int&, int&> buffers = game.find_buffer(where_lies);
+    buffers.first -= 1;
+}
+
+
 Double_increase_card::Double_increase_card(int Amount_of_strength, bool Can_be_changed,
                                            std::string Name, std::string Filename_of_image, std::string Type_of_weapon) :
         Strength_card(Amount_of_strength, Can_be_changed, Name, Filename_of_image, Type_of_weapon) {};
@@ -154,6 +189,12 @@ void Double_increase_card::use_special_ability(Game& game) {
     buffers.second *= 2;
 }
 
+void Double_increase_card::delete_card(Game &game) {
+    deletefunction(game, *this);
+    std::pair<int&, int&> buffers = game.find_buffer(where_lies);
+    buffers.second /= 1;
+}
+
 //......................................................................................погодные карты.....................................................................................//
 Weather_card::Weather_card(std::string Name, std::string Filename_of_image) : Card(Name, Filename_of_image) {};
 
@@ -168,6 +209,10 @@ void Weather_card::bot_set_where_lies(Game &game) {
     Card::bot_set_where_lies(game);
 }
 
+void Weather_card::delete_card(Game &game) {
+    Card::delete_card(game);
+}
+
 Cold_card::Cold_card(std::string Filename_of_image) : Weather_card("Cold", Filename_of_image) {};
 
 void Cold_card::use_special_ability(Game& game) {
@@ -176,10 +221,17 @@ void Cold_card::use_special_ability(Game& game) {
 }
 
 void Cold_card::set_where_lies(Game& game) {
-where_lies = "weather";
+    where_lies = "weather";
 }
+
 void Cold_card::bot_set_where_lies(Game &game) {
     set_where_lies(game);
+}
+
+void Cold_card::delete_card(Game &game) {
+    bool& is_weather_bad = game.find_weather_buffer("Cold");
+    is_weather_bad = false;
+    deletefunction(game, *this);
 }
 
 Rain_card::Rain_card(std::string Filename_of_image) : Weather_card("Rain", Filename_of_image) {};
@@ -190,10 +242,16 @@ void Rain_card::use_special_ability(Game& game) {
 }
 
 void Rain_card::set_where_lies(Game& game) {
-where_lies = "weather";
+    where_lies = "weather";
 }
 void Rain_card::bot_set_where_lies(Game &game) {
     set_where_lies(game);
+}
+
+void Rain_card::delete_card(Game &game) {
+    bool& is_weather_bad = game.find_weather_buffer("Rain");
+    is_weather_bad = false;
+    deletefunction(game, *this);
 }
 
 Haze_card::Haze_card(std::string Filename_of_image) : Weather_card("Haze", Filename_of_image) {};
@@ -204,13 +262,19 @@ void Haze_card::use_special_ability(Game& game) {
 }
 
 void Haze_card::set_where_lies(Game& game) {
-where_lies = "weather";
+    where_lies = "weather";
 }
 void Haze_card::bot_set_where_lies(Game &game) {
     set_where_lies(game);
 }
 
-Good_weather_card::Good_weather_card(std::string Filename_of_image) : Weather_card("Bright_day", Filename_of_image) {};
+void Haze_card::delete_card(Game &game) {
+    bool& is_weather_bad = game.find_weather_buffer("Haze");
+    is_weather_bad = false;
+    deletefunction(game, *this);
+}
+
+Good_weather_card::Good_weather_card(std::string Filename_of_image) : Weather_card("Bright Day", Filename_of_image) {};
 
 void Good_weather_card::use_special_ability(Game& game) {
     game.find_weather_buffer("Haze") = false;
@@ -225,6 +289,10 @@ void Good_weather_card::set_where_lies(Game& game) {
 }
 void Good_weather_card::bot_set_where_lies(Game &game) {
     set_where_lies(game);
+}
+
+void Good_weather_card::delete_card(Game &game) {
+
 }
 
 //......................................................................................Особые карты.....................................................................................//
@@ -260,4 +328,8 @@ void Double_buff_card::bot_set_where_lies(Game& game) {
     else {
         where_lies = "siege";
     }
+}
+
+void Double_buff_card::delete_card(Game &game) {
+    deletefunction(game, *this);
 }

@@ -14,6 +14,7 @@ public:
     virtual void bot_set_where_lies(Game& game);//задаём куда кладём карту
     virtual void use_special_ability(Game& game);
     virtual int recalculate(Game& game);
+    virtual void delete_card(Game& game);
 };
 
 
@@ -34,6 +35,7 @@ public:
     virtual void use_special_ability(Game& game);
     virtual void set_where_lies(Game& game);
     virtual void bot_set_where_lies(Game& game);
+    virtual void delete_card(Game& game);
 };
 
 class Usual_card : public Strength_card {
@@ -47,7 +49,8 @@ public:
 
     //Куда положить
     void set_where_lies(Game& game) override;
-    void bot_set_where_lies(Game& game);
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
 
 
@@ -57,9 +60,10 @@ public:
     Spy_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
              std::string Filename_of_image, std::string Type_of_weapon);
 
-    void set_where_lies(Game& game);
-    void use_special_ability(Game& game);
-    void bot_set_where_lies(Game& game);
+    void set_where_lies(Game& game) override;
+    void use_special_ability(Game& game) override;
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
 
 class Healing_card : Strength_card {
@@ -71,7 +75,8 @@ public:
     void set_where_lies(Game& game) override;
 
     void use_special_ability(Game& game) override;
-    void bot_set_where_lies(Game& game);
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
 
 class One_increase_card : Strength_card {
@@ -83,7 +88,8 @@ public:
     void set_where_lies(Game& game) override;
 
     void use_special_ability(Game& game) override;
-    void bot_set_where_lies(Game& game);
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
 
 class Double_increase_card : Strength_card {
@@ -95,7 +101,8 @@ public:
     void set_where_lies(Game& game) override;
 
     void use_special_ability(Game& game) override;
-    void bot_set_where_lies(Game& game);
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
 
 class Weather_card : public Card {
@@ -104,7 +111,8 @@ public:
 
     virtual void use_special_ability(Game& game);
     virtual void set_where_lies(Game& game);
-    void bot_set_where_lies(Game& game);
+    virtual void bot_set_where_lies(Game& game);
+    virtual void delete_card(Game& game);
 };
 
 class Cold_card : public Weather_card {
@@ -114,34 +122,41 @@ public:
     void use_special_ability(Game& game) override;
 
     void set_where_lies(Game& game) override;
-    void bot_set_where_lies(Game& game);
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
 
 class Rain_card : public Weather_card {
+public:
     Rain_card(std::string Filename_of_image);
 
     void use_special_ability(Game& game);
 
     void set_where_lies(Game& game) override;
-    void bot_set_where_lies(Game& game);
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
 
 class Haze_card : public Weather_card {
+public:
     Haze_card(std::string Filename_of_image);
 
     void use_special_ability(Game& game) override;
 
     void set_where_lies(Game& game) override;
-    void bot_set_where_lies(Game& game);
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
 
 class Good_weather_card : public Weather_card {
+public:
     Good_weather_card(std::string Filename_of_image);
 
     void use_special_ability(Game& game);
 
     void set_where_lies(Game& game) override;
-    void bot_set_where_lies(Game& game);
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
 
 
@@ -149,11 +164,12 @@ class Good_weather_card : public Weather_card {
 
 
 class Double_buff_card : public Card {
+public:
     Double_buff_card(std::string Filename_of_image);
 
     void use_special_ability(Game& game);
 
     void set_where_lies(Game& game) override;
-    void bot_set_where_lies(Game& game);
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
 };
-

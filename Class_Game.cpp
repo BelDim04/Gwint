@@ -55,7 +55,9 @@ std::vector<Card>& Game::find_vector(std::string where_lies) {
     if (where_lies == "player2_melee") return player2.desk.strength_melee;
     if (where_lies == "player2_archer") return player2.desk.strength_archer;
     if (where_lies == "player2_siege") return player2.desk.strength_siege;
+    if (where_lies == "weather") return weather_manager.weather;
 }
+
 
 void Game::recalculate() {
     for (int i = 0; i < now_moving().desk.strength_melee.size(); ++i) {
