@@ -27,7 +27,7 @@ public:
 
 class Player {
 public:
-    static const size_t amount_in_hand = 10;
+    static const size_t amount_in_hand = 1;
     std::vector<Card> hand;
     std::vector<Card> reset;
     std::vector<Card> deck;
@@ -39,6 +39,7 @@ public:
     int archer_sum_strength = 0;
     int siege_sum_strength = 0;
     bool has_fold = false;
+    int hp = 2;
     Player(std::vector<Card> cards, bool is_bot);
 
 };
@@ -56,14 +57,13 @@ class Game {
 public:
     Player player1;
     Player player2;
-    int player1_hp = 2;
-    int player2_hp = 2;
     bool is_first_moving;
+    bool is_first_start_round;
     Weather_manager weather_manager;
 
     Game(Player p1, Player p2, bool is_first_moving);
 
-    bool both_alive();
+    bool is_game_ended();
     void switch_turn();
     Player& now_moving();
     std::string str_now_moving();
@@ -85,7 +85,7 @@ public:
 
     size_t choose_card();
 
-    void make_turn(size_t card_index, std::string destination);
+    void move_card(size_t card_index, std::string destination);
 
     void spy_move(int a, int b);
 
@@ -96,5 +96,13 @@ public:
     //new functions
     int now_moving_hp();
     int not_now_moving_hp();
+
+    void make_turn(size_t n);
+
+    bool is_round_ended();
+
+    void on_round_ended();
+
+    void on_game_ended();
 };
 

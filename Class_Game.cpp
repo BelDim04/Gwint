@@ -20,10 +20,10 @@ Weather_manager::Weather_manager() {
     is_weather_bad_siege = false;
 }
 
-Game::Game(Player p1, Player p2, bool is_first_moving) : player1(p1), player2(p2), is_first_moving(is_first_moving) {}
+Game::Game(Player p1, Player p2, bool is_first_moving) : player1(p1), player2(p2), is_first_moving(is_first_moving), is_first_start_round(is_first_moving) {}
 
-bool Game::both_alive() {
-    return player1_hp && player2_hp;
+bool Game::is_game_ended() {
+    return !player1.hp || !player2.hp;
 }
 
 void Game::switch_turn() {
@@ -123,7 +123,6 @@ bool Game::is_there_Doublebuff(std::string where_lies) {
 }
 
 void Game::play_round() {
-    bool is_first_moving_next_round = !is_first_moving;
     while (!(player1.has_fold && player2.has_fold)) {
         if (now_moving().has_fold) {
             is_first_moving = !is_first_moving;
@@ -139,22 +138,22 @@ void Game::play_round() {
             now_moving().hand[card_index].set_where_lies(*this);
             std::string destination = now_moving().hand[card_index].where_lies;
         }
-        make_turn(card_index, destination);
+        move_card(card_index, destination);
         now_moving().hand[card_index].use_special_ability(*this);
         recalculate();
         is_first_moving = !is_first_moving;
     }
     //запустить анимацию после пересчёта
 
-    if (player1.sum_strength <= player2.sum_strength) player1_hp--;
-    if (player2.sum_strength <= player1.sum_strength) player2_hp--;
+    if (player1.sum_strength <= player2.sum_strength) player1.hp--;
+    if (player2.sum_strength <= player1.sum_strength) player2.hp--;
 }
 
 size_t Game::choose_card() {
     //графический выбор карты
 }
 
-void Game::make_turn(size_t card_index, std::string destination) {
+void Game::move_card(size_t card_index, std::string destination) {
     Card card = now_moving().hand[card_index];
     now_moving().hand.erase(now_moving().hand.begin() + card_index);
     if (destination == "player1_buff_melee") player1.desk.buff_melee.push_back(card);
@@ -208,11 +207,44 @@ std::pair<int&, int&> Game::find_buffer(std::string where_lies) {
 
 //new functions:
 int Game::now_moving_hp() {
-    if(str_now_moving() == "player1") return player1_hp;
-    else return player2_hp;
+    if(str_now_moving() == "player1") return player1.hp;
+    else return player2.hp;
 }
 
 int Game::not_now_moving_hp() {
-    if(str_not_now_moving() == "player1") return player1_hp;
-    else return player2_hp;
+    if(str_not_now_moving() == "player1") return player1.hp;
+    else return player2.hp;
+}
+
+void Game::make_turn(size_t n) {
+    if (now_moving().has_fold) {
+        is_first_moving = !is_first_moving;
+        return;
+    }
+    now_moving().hand[n].set_where_lies(*this);
+    std::string destination = now_moving().hand[n].where_lies;
+    move_card(n, destination);
+    now_moving().hand[n].use_special_ability(*this);
+    recalculate();
+    switch_turn();
+    if(is_round_ended()){
+        on_round_ended();
+    }
+}
+
+bool Game::is_round_ended() {
+    return player1.has_fold && player2.has_fold;
+}
+
+void Game::on_round_ended() {
+    if (player1.sum_strength <= player2.sum_strength) player1.hp--;
+    if (player2.sum_strength <= player1.sum_strength) player2.hp--;
+    player1.has_fold = false;
+    player2.has_fold = false;
+    is_first_moving = ! is_first_start_round;
+    is_first_start_round = is_first_moving;
+}
+
+void Game::on_game_ended() {
+
 }
