@@ -9,18 +9,19 @@ public:
     std::string name;
     std::string filename_of_image;
     std::string where_lies;
-    Card(std::string Name, std::string Filename_of_image);
+    Card(std::string Name, std::string Filename_of_image, int Amount_of_strength_now);
     virtual void set_where_lies(Game& game);//задаём куда кладём карту
     virtual void bot_set_where_lies(Game& game);//задаём куда кладём карту
     virtual void use_special_ability(Game& game);
     virtual int recalculate(Game& game);
     virtual void delete_card(Game& game);
+    int amount_of_strength_now = -1;
 };
 
 
 class Strength_card : public Card {
 public:
-    int amount_of_strength_now;//у силовой карты есть текущая сила
+   // int amount_of_strength_now;//у силовой карты есть текущая сила
     const int base_amount_of_strength;//у силовой карты есть изначальная сила
     int basic_strength = 1;//базовая сила-та сила, которая становится у карты при дебаффе
     const bool can_be_changed;//можно ли повлиять на карту
@@ -61,6 +62,17 @@ public:
              std::string Filename_of_image, std::string Type_of_weapon);
 
     void set_where_lies(Game& game) override;
+    void use_special_ability(Game& game) override;
+    void bot_set_where_lies(Game& game) override;
+    void delete_card(Game& game) override;
+};
+
+class Delete_card : public Strength_card {
+    Delete_card(int Amount_of_strength, bool Can_be_changed,
+                std::string Name, std::string Filename_of_image, std::string Type_of_weapon);
+
+    void set_where_lies(Game& game) override;
+
     void use_special_ability(Game& game) override;
     void bot_set_where_lies(Game& game) override;
     void delete_card(Game& game) override;

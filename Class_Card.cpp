@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include<algorithm>
 #include "Class_Card.h"
 #include "Class_Game.h"
 
@@ -14,7 +15,8 @@ void deletefunction(Game& game, Card& card) {
     }
 }
 
-Card::Card(std::string Name, std::string Filename_of_image) : name(Name), filename_of_image(Filename_of_image) {}
+Card::Card(std::string Name, std::string Filename_of_image, int Amount_of_strength_now) :
+    name(Name), filename_of_image(Filename_of_image) , amount_of_strength_now(Amount_of_strength_now){}
 
 void Card::set_where_lies(Game &game) {
 
@@ -39,7 +41,7 @@ void Card::delete_card(Game &game) {
 
 Strength_card::Strength_card(int Amount_of_strength, bool Can_be_changed,
                              std::string Name, std::string Filename_of_image, std::string Type_of_weapon) :
-        Card(Name, Filename_of_image), amount_of_strength_now(Amount_of_strength),
+        Card(Name, Filename_of_image, amount_of_strength_now),
         base_amount_of_strength(Amount_of_strength), can_be_changed(Can_be_changed), type_of_weapon(Type_of_weapon) {};
 
 int Strength_card::recalculate(Game& game) {
@@ -120,6 +122,62 @@ void Spy_card::delete_card(Game &game) {
     deletefunction(game, *this);
 }
 
+Delete_card::Delete_card(int Amount_of_strength, bool Can_be_changed, std::string Name, std::string Filename_of_image,
+                         std::string Type_of_weapon)  :
+        Strength_card(Amount_of_strength, Can_be_changed, Name, Filename_of_image, Type_of_weapon) {};
+
+void Delete_card::set_where_lies(Game& game) {
+    where_lies = game.str_now_moving();
+    where_lies += "_";
+    where_lies += (type_of_weapon);
+}
+
+void Delete_card::bot_set_where_lies(Game &game) {
+    set_where_lies(game);
+}
+
+void Delete_card::use_special_ability(Game &game) {
+    int max1 = -1, max2 = -1, max3 = -1;
+    int ind1 = -1, ind2 = -1, ind3 = -1;
+
+    for(int i = 0; i < game.not_now_moving().desk.strength_melee.size(); ++i) {
+        if(game.not_now_moving().desk.strength_melee[i].amount_of_strength_now > max1) {
+            ind1 = i;
+            max1 = game.not_now_moving().desk.strength_melee[i].amount_of_strength_now;
+        }
+    }
+
+    for(int i = 0; i < game.not_now_moving().desk.strength_archer.size(); ++i) {
+        if(game.not_now_moving().desk.strength_archer[i].amount_of_strength_now > max1) {
+            ind2 = i;
+            max2 = game.not_now_moving().desk.strength_archer[i].amount_of_strength_now;
+        }
+    }
+
+    for(int i = 0; i < game.not_now_moving().desk.strength_siege.size(); ++i) {
+        if(game.not_now_moving().desk.strength_siege[i].amount_of_strength_now > max1) {
+            ind3 = i;
+            max3 = game.not_now_moving().desk.strength_siege[i].amount_of_strength_now;
+        }
+    }
+    if(ind1 == -1 && ind2 == -1 && ind3 == -1) return;
+    else {
+        if(max1 >= max2 && max1>=max3) {
+            deletefunction(game, game.not_now_moving().desk.strength_melee[ind1]);
+        }
+        else if(max2 >= max1 && max2 >= max3) {
+            deletefunction(game, game.not_now_moving().desk.strength_archer[ind2]);
+        }
+        else {
+            deletefunction(game, game.not_now_moving().desk.strength_siege[ind3]);
+        }
+    }
+}
+
+void Delete_card::delete_card(Game &game) {
+    deletefunction(game, *this);
+}
+
 Healing_card::Healing_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
                            std::string Filename_of_image, std::string Type_of_weapon) :
         Strength_card(Amount_of_strength, Can_be_changed, Name, Filename_of_image, Type_of_weapon) {};
@@ -129,6 +187,7 @@ void Healing_card::set_where_lies(Game& game) {
     where_lies += "_";
     where_lies += (type_of_weapon);
 }
+
 void Healing_card::bot_set_where_lies(Game &game) {
     set_where_lies(game);
 }
@@ -196,7 +255,7 @@ void Double_increase_card::delete_card(Game &game) {
 }
 
 //......................................................................................погодные карты.....................................................................................//
-Weather_card::Weather_card(std::string Name, std::string Filename_of_image) : Card(Name, Filename_of_image) {};
+Weather_card::Weather_card(std::string Name, std::string Filename_of_image) : Card(Name, Filename_of_image, -1) {};
 
 void Weather_card::use_special_ability(Game& game){
 
@@ -297,7 +356,7 @@ void Good_weather_card::delete_card(Game &game) {
 
 //......................................................................................Особые карты.....................................................................................//
 
-Double_buff_card::Double_buff_card(std::string Filename_of_image) : Card("Command Horn", Filename_of_image) {};
+Double_buff_card::Double_buff_card(std::string Filename_of_image) : Card("Command Horn", Filename_of_image, -1) {};
 
 
 void Double_buff_card::use_special_ability(Game& game) {
