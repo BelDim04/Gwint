@@ -15,12 +15,12 @@ public:
 
 class Desk {
 public:
-    std::vector<Card> buff_melee;
-    std::vector<Card> buff_archer;
-    std::vector<Card> buff_siege;
-    std::vector<Card> strength_melee;
-    std::vector<Card> strength_archer;
-    std::vector<Card> strength_siege;
+    std::vector<Card*> buff_melee;
+    std::vector<Card*> buff_archer;
+    std::vector<Card*> buff_siege;
+    std::vector<Card*> strength_melee;
+    std::vector<Card*> strength_archer;
+    std::vector<Card*> strength_siege;
     Buff_manager buff_manager;
 };
 
@@ -28,9 +28,9 @@ public:
 class Player {
 public:
     static const size_t amount_in_hand = 1;
-    std::vector<Card> hand;
-    std::vector<Card> reset;
-    std::vector<Card> deck;
+    std::vector<Card*> hand;
+    std::vector<Card*> reset;
+    std::vector<Card*> deck;
     Desk desk;
     const bool is_bot;
     //type_of_fraction
@@ -40,13 +40,13 @@ public:
     int siege_sum_strength = 0;
     bool has_fold = false;
     int hp = 2;
-    Player(std::vector<Card> cards, bool is_bot);
+    Player(std::vector<Card*> cards, bool is_bot);
 
 };
 
 class Weather_manager {
 public:
-    std::vector<Card> weather;
+    std::vector<Card*> weather;
     bool is_weather_bad_melee;
     bool is_weather_bad_archer;
     bool is_weather_bad_siege;
@@ -70,10 +70,10 @@ public:
     Player& not_now_moving();
     std::string str_not_now_moving();
 
-    std::vector<Card>& find_vector(std::string where_lies);
+    std::vector<Card*>& find_vector(std::string where_lies);
     void recalculate();
 
-    std::vector<Card>& find_weather();
+    std::vector<Card*>& find_weather();
 
     bool is_weather_bad(std::string where_lies);
 

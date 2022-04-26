@@ -5,11 +5,11 @@
 #include "Class_Card.h"
 #include "Class_Game.h"
 
-void deletefunction(Game& game, Card& card) {
-    int n = game.find_vector(card.where_lies).size();
+void deletefunction(Game& game, Card* card) {
+    int n = game.find_vector(card->where_lies).size();
     for(int i = 0; i < n; ++i) {
-        if(game.find_vector(card.where_lies)[i].name == card.name) {
-            game.find_vector(card.where_lies).erase(game.find_vector(card.where_lies).begin()+i);
+        if(game.find_vector(card->where_lies)[i]->name == card->name) {
+            game.find_vector(card->where_lies).erase(game.find_vector(card->where_lies).begin()+i);
             break;
         }
     }
@@ -93,7 +93,7 @@ void Usual_card::bot_set_where_lies(Game &game) {
 }
 
 void Usual_card::delete_card(Game &game) {
-    deletefunction(game, *this);
+    deletefunction(game, this);
 }
 
 Spy_card::Spy_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
@@ -111,15 +111,16 @@ void Spy_card::bot_set_where_lies(Game &game) {
 
 void Spy_card::use_special_ability(Game& game){
     //рандомно выбрать карты из колоды и добавить в руку
-    std::vector<Card>& deck = game.now_moving().deck;
+    std::vector<Card*>& deck = game.now_moving().deck;
     int a = rand() % deck.size();
     int b = rand() % deck.size();
+    if(deck.size() <= 1) return;
     while (a == b)  b = rand() % deck.size();
     game.spy_move(a, b);
 }
 
 void Spy_card::delete_card(Game &game) {
-    deletefunction(game, *this);
+    deletefunction(game, this);
 }
 
 Delete_card::Delete_card(int Amount_of_strength, bool Can_be_changed, std::string Name, std::string Filename_of_image,
@@ -141,23 +142,23 @@ void Delete_card::use_special_ability(Game &game) {
     int ind1 = -1, ind2 = -1, ind3 = -1;
 
     for(int i = 0; i < game.not_now_moving().desk.strength_melee.size(); ++i) {
-        if(game.not_now_moving().desk.strength_melee[i].amount_of_strength_now > max1) {
+        if(game.not_now_moving().desk.strength_melee[i]->amount_of_strength_now > max1) {
             ind1 = i;
-            max1 = game.not_now_moving().desk.strength_melee[i].amount_of_strength_now;
+            max1 = game.not_now_moving().desk.strength_melee[i]->amount_of_strength_now;
         }
     }
 
     for(int i = 0; i < game.not_now_moving().desk.strength_archer.size(); ++i) {
-        if(game.not_now_moving().desk.strength_archer[i].amount_of_strength_now > max1) {
+        if(game.not_now_moving().desk.strength_archer[i]->amount_of_strength_now > max1) {
             ind2 = i;
-            max2 = game.not_now_moving().desk.strength_archer[i].amount_of_strength_now;
+            max2 = game.not_now_moving().desk.strength_archer[i]->amount_of_strength_now;
         }
     }
 
     for(int i = 0; i < game.not_now_moving().desk.strength_siege.size(); ++i) {
-        if(game.not_now_moving().desk.strength_siege[i].amount_of_strength_now > max1) {
+        if(game.not_now_moving().desk.strength_siege[i]->amount_of_strength_now > max1) {
             ind3 = i;
-            max3 = game.not_now_moving().desk.strength_siege[i].amount_of_strength_now;
+            max3 = game.not_now_moving().desk.strength_siege[i]->amount_of_strength_now;
         }
     }
     if(ind1 == -1 && ind2 == -1 && ind3 == -1) return;
@@ -175,7 +176,7 @@ void Delete_card::use_special_ability(Game &game) {
 }
 
 void Delete_card::delete_card(Game &game) {
-    deletefunction(game, *this);
+    deletefunction(game, this);
 }
 
 Healing_card::Healing_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
@@ -194,7 +195,7 @@ void Healing_card::bot_set_where_lies(Game &game) {
 
 void Healing_card::use_special_ability(Game& game) {
     //рандомно выбрать карту из сброса и добавить в руку
-    std::vector<Card>& reset = game.now_moving().reset;
+    std::vector<Card*>& reset = game.now_moving().reset;
     if (reset.size()) {
         int a = rand() % reset.size();
         game.healing_move(a);
@@ -202,7 +203,7 @@ void Healing_card::use_special_ability(Game& game) {
 }
 
 void Healing_card::delete_card(Game &game) {
-    deletefunction(game, *this);
+    deletefunction(game, this);
 }
 
 One_increase_card::One_increase_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
@@ -224,7 +225,7 @@ void One_increase_card::use_special_ability(Game& game) {
 }
 
 void One_increase_card::delete_card(Game &game) {
-    deletefunction(game, *this);
+    deletefunction(game, this);
     std::pair<int&, int&> buffers = game.find_buffer(where_lies);
     buffers.first -= 1;
 }
@@ -249,7 +250,7 @@ void Double_increase_card::use_special_ability(Game& game) {
 }
 
 void Double_increase_card::delete_card(Game &game) {
-    deletefunction(game, *this);
+    deletefunction(game, this);
     std::pair<int&, int&> buffers = game.find_buffer(where_lies);
     buffers.second /= 1;
 }
@@ -290,7 +291,7 @@ void Cold_card::bot_set_where_lies(Game &game) {
 void Cold_card::delete_card(Game &game) {
     bool& is_weather_bad = game.find_weather_buffer("Cold");
     is_weather_bad = false;
-    deletefunction(game, *this);
+    deletefunction(game, this);
 }
 
 Rain_card::Rain_card(std::string Filename_of_image) : Weather_card("Rain", Filename_of_image) {};
@@ -310,7 +311,7 @@ void Rain_card::bot_set_where_lies(Game &game) {
 void Rain_card::delete_card(Game &game) {
     bool& is_weather_bad = game.find_weather_buffer("Rain");
     is_weather_bad = false;
-    deletefunction(game, *this);
+    deletefunction(game, this);
 }
 
 Haze_card::Haze_card(std::string Filename_of_image) : Weather_card("Haze", Filename_of_image) {};
@@ -330,7 +331,7 @@ void Haze_card::bot_set_where_lies(Game &game) {
 void Haze_card::delete_card(Game &game) {
     bool& is_weather_bad = game.find_weather_buffer("Haze");
     is_weather_bad = false;
-    deletefunction(game, *this);
+    deletefunction(game, this);
 }
 
 Good_weather_card::Good_weather_card(std::string Filename_of_image) : Weather_card("Bright Day", Filename_of_image) {};
@@ -390,5 +391,5 @@ void Double_buff_card::bot_set_where_lies(Game& game) {
 }
 
 void Double_buff_card::delete_card(Game &game) {
-    deletefunction(game, *this);
+    deletefunction(game, this);
 }

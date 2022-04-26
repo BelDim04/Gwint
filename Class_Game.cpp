@@ -4,7 +4,7 @@
 #include<string>
 #include <typeinfo>
 
-Player::Player(std::vector<Card> cards, bool is_bot) : is_bot(is_bot) {
+Player::Player(std::vector<Card*> cards, bool is_bot) : is_bot(is_bot) {
     for (size_t i = 0; i < amount_in_hand; ++i) {
         hand.push_back(cards[i]);
     }
@@ -51,7 +51,7 @@ std::string Game::str_not_now_moving() {
     return "player1";
 }
 
-std::vector<Card>& Game::find_vector(std::string where_lies) {
+std::vector<Card*>& Game::find_vector(std::string where_lies) {
     if (where_lies == "player1_melee") return player1.desk.strength_melee;
     if (where_lies == "player1_archer") return player1.desk.strength_archer;
     if (where_lies == "player1_siege") return player1.desk.strength_siege;
@@ -64,38 +64,38 @@ std::vector<Card>& Game::find_vector(std::string where_lies) {
 
 void Game::recalculate() {
     for (int i = 0; i < now_moving().desk.strength_melee.size(); ++i) {
-        int a = now_moving().desk.strength_melee[i].recalculate(*this);
+        int a = now_moving().desk.strength_melee[i]->recalculate(*this);
         now_moving().sum_strength+=a;
         now_moving().melee_sum_strength+=a;
     }
     for (int i = 0; i < now_moving().desk.strength_archer.size(); ++i) {
-        int a = now_moving().desk.strength_archer[i].recalculate(*this);;
+        int a = now_moving().desk.strength_archer[i]->recalculate(*this);;
         now_moving().sum_strength += a;
         now_moving().archer_sum_strength += a;
     }
     for (int i = 0; i < now_moving().desk.strength_siege.size(); ++i) {
-        int a = now_moving().desk.strength_siege[i].recalculate(*this);
+        int a = now_moving().desk.strength_siege[i]->recalculate(*this);
         now_moving().sum_strength += a;
         now_moving().siege_sum_strength += a;
     }
     for (int i = 0; i < not_now_moving().desk.strength_melee.size(); ++i) {
-        int a = not_now_moving().desk.strength_melee[i].recalculate(*this);
+        int a = not_now_moving().desk.strength_melee[i]->recalculate(*this);
         not_now_moving().sum_strength += a;
         not_now_moving().melee_sum_strength += a;
     }
     for (int i = 0; i < not_now_moving().desk.strength_archer.size(); ++i) {
-        int a = not_now_moving().desk.strength_archer[i].recalculate(*this);
+        int a = not_now_moving().desk.strength_archer[i]->recalculate(*this);
         not_now_moving().sum_strength += a;
         not_now_moving().archer_sum_strength += a;
     }
     for (int i = 0; i < not_now_moving().desk.strength_siege.size(); ++i) {
-        int a = not_now_moving().desk.strength_siege[i].recalculate(*this);
+        int a = not_now_moving().desk.strength_siege[i]->recalculate(*this);
         not_now_moving().sum_strength += a;
         not_now_moving().siege_sum_strength += a;
     }
 }
 
-std::vector<Card>& Game::find_weather() {
+std::vector<Card*>& Game::find_weather() {
     return weather_manager.weather;
 }
 
@@ -135,11 +135,11 @@ void Game::play_round() {
         }
         else {
             card_index = choose_card();
-            now_moving().hand[card_index].set_where_lies(*this);
-            std::string destination = now_moving().hand[card_index].where_lies;
+            now_moving().hand[card_index]->set_where_lies(*this);
+            std::string destination = now_moving().hand[card_index]->where_lies;
         }
         move_card(card_index, destination);
-        now_moving().hand[card_index].use_special_ability(*this);
+        now_moving().hand[card_index]->use_special_ability(*this);
         recalculate();
         is_first_moving = !is_first_moving;
     }
@@ -154,7 +154,7 @@ size_t Game::choose_card() {
 }
 
 void Game::move_card(size_t card_index, std::string destination) {
-    Card card = now_moving().hand[card_index];
+    Card* card = now_moving().hand[card_index];
     now_moving().hand.erase(now_moving().hand.begin() + card_index);
     if (destination == "player1_buff_melee") player1.desk.buff_melee.push_back(card);
     else if (destination == "player1_buff_archer") player1.desk.buff_archer.push_back(card);
@@ -173,8 +173,8 @@ void Game::move_card(size_t card_index, std::string destination) {
 }
 
 void Game::spy_move(int a, int b) {
-    Card mv_f = now_moving().deck[a];
-    Card mv_s = now_moving().deck[b];
+    Card* mv_f = now_moving().deck[a];
+    Card* mv_s = now_moving().deck[b];
     if (a > b) {
         now_moving().deck.erase(now_moving().deck.begin() + a);
         now_moving().deck.erase(now_moving().deck.begin() + b);
@@ -189,7 +189,7 @@ void Game::spy_move(int a, int b) {
 }
 
 void Game::healing_move(int a) {
-    Card mv = now_moving().reset[a];
+    Card* mv = now_moving().reset[a];
     now_moving().reset.erase(now_moving().reset.begin() + a);
     now_moving().hand.push_back(mv);
     //анимация переноса
@@ -221,10 +221,10 @@ void Game::make_turn(size_t n) {
         is_first_moving = !is_first_moving;
         return;
     }
-    now_moving().hand[n].set_where_lies(*this);
-    std::string destination = now_moving().hand[n].where_lies;
+    now_moving().hand[n]->set_where_lies(*this);
+    std::string destination = now_moving().hand[n]->where_lies;
     move_card(n, destination);
-    now_moving().hand[n].use_special_ability(*this);
+    now_moving().hand[n]->use_special_ability(*this);
     recalculate();
     switch_turn();
     if(is_round_ended()){
