@@ -1,3 +1,4 @@
+#pragma once
 #include "Class_Card.h"
 
 class Src{
