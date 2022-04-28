@@ -36,6 +36,8 @@ public:
         declare_Siege_Support();
         declare_Stephan_Skellin();
         declare_Yorvet();
+        declare_Shirru();
+        declare_PrinceToad();
     }
 
 
@@ -526,5 +528,31 @@ public:
     }
     Card* get_Yorvet() {
         return &(Yorvet_vector[index_Yorvet++]);
+    }
+
+    Delete_card Shirru = Delete_card(7, 1,
+      "Shirru", "src/Shirru", "siege");
+    std::vector<Delete_card> Shirru_vector;
+    int index_Shirru = 0;
+    void declare_Shirru() {
+        for(int i = 0; i < 15; ++i) {
+            Shirru_vector.push_back(Shirru);
+        }
+    }
+    Card* get_Shirru() {
+        return &(Shirru_vector[index_Shirru++]);
+    }
+
+    Delete_card PrinceToad = Delete_card(9, 0,
+                                     "PrinceToad", "src/PrinceToad", "archer");
+    std::vector<Delete_card> PrinceToad_vector;
+    int index_PrinceToad = 0;
+    void declare_PrinceToad() {
+        for(int i = 0; i < 15; ++i) {
+            Shirru_vector.push_back(Shirru);
+        }
+    }
+    Card* get_PrinceToad() {
+        return &(Shirru_vector[index_Shirru++]);
     }
 };
