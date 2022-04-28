@@ -27,7 +27,7 @@ public:
 
 class Player {
 public:
-    static const size_t amount_in_hand = 1;
+    static const size_t amount_in_hand = 3;
     std::vector<Card*> hand;
     std::vector<Card*> reset;
     std::vector<Card*> deck;

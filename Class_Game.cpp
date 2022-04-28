@@ -27,7 +27,7 @@ bool Game::is_game_ended() {
 }
 
 void Game::switch_turn() {
-    is_first_moving = !is_first_moving;
+    if(!not_now_moving().has_fold) is_first_moving = !is_first_moving;
 }
 
 Player& Game::now_moving() {
@@ -101,8 +101,8 @@ std::vector<Card*>& Game::find_weather() {
 
 bool Game::is_weather_bad(std::string where_lies) {
     if ((where_lies == "player1_melee" || where_lies == "player2_melee") && find_weather_buffer("Cold") ||
-        (where_lies == "player1_melee" || where_lies == "player2_melee") && find_weather_buffer("Rain") ||
-        (where_lies == "player1_melee" || where_lies == "player2_melee") && find_weather_buffer("Hase"))
+        (where_lies == "player1_archer" || where_lies == "player2_archer") && find_weather_buffer("Rain") ||
+        (where_lies == "player1_siege" || where_lies == "player2_siege") && find_weather_buffer("Haze"))
         return true;
     return false;
 }
@@ -162,12 +162,12 @@ void Game::move_card(size_t card_index, std::string destination) {
     else if (destination == "player1_melee") player1.desk.strength_melee.push_back(card);
     else if (destination == "player1_archer") player1.desk.strength_archer.push_back(card);
     else if (destination == "player1_siege") player1.desk.strength_siege.push_back(card);
-    else if (destination == "player1_buff_melee") player2.desk.buff_melee.push_back(card);
-    else if (destination == "player1_buff_archer") player2.desk.buff_archer.push_back(card);
-    else if (destination == "player1_buff_siege") player2.desk.buff_siege.push_back(card);
-    else if (destination == "player1_melee") player2.desk.strength_melee.push_back(card);
-    else if (destination == "player1_archer") player2.desk.strength_archer.push_back(card);
-    else if (destination == "player1_siege") player2.desk.strength_siege.push_back(card);
+    else if (destination == "player2_buff_melee") player2.desk.buff_melee.push_back(card);
+    else if (destination == "player2_buff_archer") player2.desk.buff_archer.push_back(card);
+    else if (destination == "player2_buff_siege") player2.desk.buff_siege.push_back(card);
+    else if (destination == "player2_melee") player2.desk.strength_melee.push_back(card);
+    else if (destination == "player2_archer") player2.desk.strength_archer.push_back(card);
+    else if (destination == "player2_siege") player2.desk.strength_siege.push_back(card);
     else if (destination == "weather") weather_manager.weather.push_back(card);
     //анимация броска карты
 }
@@ -217,19 +217,12 @@ int Game::not_now_moving_hp() {
 }
 
 void Game::make_turn(size_t n) {
-    if (now_moving().has_fold) {
-        is_first_moving = !is_first_moving;
-        return;
-    }
     now_moving().hand[n]->set_where_lies(*this);
     std::string destination = now_moving().hand[n]->where_lies;
-    move_card(n, destination);
     now_moving().hand[n]->use_special_ability(*this);
+    move_card(n, destination);
     recalculate();
     switch_turn();
-    if(is_round_ended()){
-        on_round_ended();
-    }
 }
 
 bool Game::is_round_ended() {

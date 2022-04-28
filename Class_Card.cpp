@@ -112,6 +112,7 @@ void Spy_card::bot_set_where_lies(Game &game) {
 void Spy_card::use_special_ability(Game& game){
     //рандомно выбрать карты из колоды и добавить в руку
     std::vector<Card*>& deck = game.now_moving().deck;
+    if(deck.size() == 0) return;
     int a = rand() % deck.size();
     int b = rand() % deck.size();
     if(deck.size() <= 1) return;
