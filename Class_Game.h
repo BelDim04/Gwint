@@ -1,4 +1,3 @@
-#pragma once
 #include<iostream>
 #include<vector>
 
@@ -33,7 +32,7 @@ public:
     std::vector<Card*> reset;
     std::vector<Card*> deck;
     Desk desk;
-     bool is_bot;
+    const bool is_bot;
     //type_of_fraction
     int sum_strength = 0;
     int melee_sum_strength = 0;

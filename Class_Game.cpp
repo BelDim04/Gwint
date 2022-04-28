@@ -5,13 +5,11 @@
 #include <typeinfo>
 
 Player::Player(std::vector<Card*> cards, bool is_bot) : is_bot(is_bot) {
-    if(cards.size() != 0) {
-        for (size_t i = 0; i < amount_in_hand; ++i) {
-            hand.push_back(cards[i]);
-        }
-        for (size_t i = 0; i < cards.size() - amount_in_hand; ++i) {
-            deck.push_back(cards[i + amount_in_hand]);
-        }
+    for (size_t i = 0; i < amount_in_hand; ++i) {
+        hand.push_back(cards[i]);
+    }
+    for(size_t i = 0; i < cards.size() - amount_in_hand; ++i) {
+        deck.push_back(cards[i + amount_in_hand]);
     }
 }
 
