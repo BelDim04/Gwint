@@ -70,7 +70,8 @@ public:
 
     GameAnimation(Game& g): window(sf::VideoMode(900, 700), "Test"), gameLogic(g){
         std::string parent_path = std::filesystem::current_path().parent_path();
-        textureHolder.load("Game_Table", parent_path+"/src/Game_table.jpg");
+        parent_path+="/";
+        textureHolder.load("Game_Table", parent_path+"src/Game_table.jpg");
         for(const auto& card: g.player1.hand){
             textureHolder.load(card->name, parent_path+card->filename_of_image);
         }
