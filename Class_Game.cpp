@@ -11,6 +11,21 @@ Player::Player(std::vector<Card*> cards, bool is_bot) : is_bot(is_bot) {
     for(size_t i = 0; i < cards.size() - amount_in_hand; ++i) {
         deck.push_back(cards[i + amount_in_hand]);
     }
+}
+
+void Player::clear() {
+    reset.insert(reset.end(), desk.buff_archer.begin(), desk.buff_archer.end());
+    desk.buff_archer.clear();
+    reset.insert(reset.end(), desk.buff_melee.begin(), desk.buff_melee.end());
+    desk.buff_melee.clear();
+    reset.insert(reset.end(), desk.buff_siege.begin(), desk.buff_siege.end());
+    desk.buff_siege.clear();
+    reset.insert(reset.end(), desk.strength_melee.begin(), desk.strength_melee.end());
+    desk.strength_melee.clear();
+    reset.insert(reset.end(), desk.strength_archer.begin(), desk.strength_archer.end());
+    desk.strength_archer.clear();
+    reset.insert(reset.end(), desk.strength_siege.begin(), desk.strength_siege.end());
+    desk.strength_siege.clear();
 };
 
 Weather_manager::Weather_manager() {
@@ -232,6 +247,8 @@ bool Game::is_round_ended() {
 void Game::on_round_ended() {
     if (player1.sum_strength <= player2.sum_strength) player1.hp--;
     if (player2.sum_strength <= player1.sum_strength) player2.hp--;
+    player1.clear();
+    player2.clear();
     player1.has_fold = false;
     player2.has_fold = false;
     is_first_moving = ! is_first_start_round;

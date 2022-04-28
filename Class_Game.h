@@ -42,6 +42,7 @@ public:
     int hp = 2;
     Player(std::vector<Card*> cards, bool is_bot);
 
+    void clear();
 };
 
 class Weather_manager {

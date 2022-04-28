@@ -67,11 +67,14 @@ public:
 
     bool is_menu_open = true;
 
+    bool is_waiting = true;
+
 
     GameAnimation(Game& g): window(sf::VideoMode(900, 700), "Test"), gameLogic(g){
         std::string parent_path = std::filesystem::current_path().parent_path();
         parent_path+="/";
         textureHolder.load("Game_Table", parent_path+"src/Game_table.jpg");
+        textureHolder.load("fold_button", parent_path+"src/fold.jpg");
         for(const auto& card: g.player1.hand){
             textureHolder.load(card->name, parent_path+card->filename_of_image);
         }
@@ -99,21 +102,29 @@ public:
         while (window.pollEvent(event)){
             switch (event.type) {
                 case sf::Event::MouseButtonReleased:{
-                    bool flag =false;
-                    for(size_t i=0;i<clickSprites.size();++i){
+                    if(is_waiting){
+                        is_waiting = false;
+                        break;
+                    }
+                    bool moving = gameLogic.is_first_moving;
+                    for(size_t i=0;i<clickSprites.size()-1;++i){
                         sf::Sprite sprite = clickSprites[i];
                         sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                         sf::FloatRect bounds = sprite.getGlobalBounds();
                         if (bounds.contains(mouse)){
                             gameLogic.make_turn(i);
-                            flag =true;
                             break;
                         }
                     }
-                    if(!flag) {
+                    sf::Sprite foldSprite = clickSprites[clickSprites.size()-1];
+                    sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                    sf::FloatRect bounds = foldSprite.getGlobalBounds();
+                    if (bounds.contains(mouse)){
                         gameLogic.now_moving().has_fold = true;
                         gameLogic.switch_turn();
                     }
+
+                    if(gameLogic.is_first_moving != moving) is_waiting = true;
                     break;
                 }
                 case sf::Event::Closed:{
@@ -136,6 +147,10 @@ public:
 
     void render(){
         window.clear();
+        if(is_waiting){
+            window.display();
+            return;
+        }
         /*if(is_menu_open){
             main_menu();
             window.display();
@@ -147,7 +162,11 @@ public:
         Player& curPlayer = gameLogic.now_moving();
         Player& otherPlayer = gameLogic.not_now_moving();
         clickSprites.clear();
-        show_line_of_cards(curPlayer.hand, 0, 900, 600, true);
+        show_line_of_cards(curPlayer.hand, 0, 700, 600, true);
+        sf::Sprite foldSprite(textureHolder.get("fold_button"));
+        foldSprite.setPosition(720, 630);
+        window.draw(foldSprite);
+        clickSprites.push_back(foldSprite);
         show_line_of_cards(curPlayer.desk.strength_melee, 330, 900, 300, false);
         show_line_of_cards(curPlayer.desk.strength_siege, 330, 900, 400, false);
         show_line_of_cards(curPlayer.desk.strength_archer, 330, 900, 500, false);
