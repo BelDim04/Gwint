@@ -375,6 +375,7 @@ void Double_buff_card::use_special_ability(Game& game) {
 void Double_buff_card::set_where_lies(Game& game) {
 //а здесь происходит ввод, куда надо положить
 //wheer_lies имеет вид playeri_buff_melee/archer/siege
+    where_lies = game.str_now_moving() + "_buff_melee";
 }
 
 void Double_buff_card::bot_set_where_lies(Game& game) {

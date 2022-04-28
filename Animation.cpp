@@ -67,7 +67,7 @@ public:
 
     bool is_menu_open = true;
 
-    bool is_waiting = true;
+    bool is_waiting = false;
 
 
     GameAnimation(Game& g): window(sf::VideoMode(900, 700), "Test"), gameLogic(g){
@@ -167,12 +167,21 @@ public:
         foldSprite.setPosition(720, 630);
         window.draw(foldSprite);
         clickSprites.push_back(foldSprite);
-        show_line_of_cards(curPlayer.desk.strength_melee, 330, 900, 300, false);
-        show_line_of_cards(curPlayer.desk.strength_siege, 330, 900, 400, false);
-        show_line_of_cards(curPlayer.desk.strength_archer, 330, 900, 500, false);
-        show_line_of_cards(otherPlayer.desk.strength_melee, 330, 900, 200, false);
-        show_line_of_cards(otherPlayer.desk.strength_siege, 330, 900, 100, false);
-        show_line_of_cards(otherPlayer.desk.strength_archer, 330, 900, 0, false);
+        show_line_of_cards(curPlayer.desk.strength_melee, 340, 900, 300, false);
+        show_line_of_cards(curPlayer.desk.strength_siege, 340, 900, 400, false);
+        show_line_of_cards(curPlayer.desk.strength_archer, 340, 900, 500, false);
+        show_line_of_cards(otherPlayer.desk.strength_melee, 340, 900, 200, false);
+        show_line_of_cards(otherPlayer.desk.strength_siege, 340, 900, 100, false);
+        show_line_of_cards(otherPlayer.desk.strength_archer, 340, 900, 0, false);
+
+        show_line_of_cards(curPlayer.desk.buff_melee, 265, 265, 300, false);
+        show_line_of_cards(curPlayer.desk.buff_siege, 265, 265, 400, false);
+        show_line_of_cards(curPlayer.desk.buff_archer, 265, 265, 500, false);
+        show_line_of_cards(otherPlayer.desk.buff_melee, 265, 265, 200, false);
+        show_line_of_cards(otherPlayer.desk.buff_siege, 265, 265, 100, false);
+        show_line_of_cards(otherPlayer.desk.buff_archer, 265, 265, 0, false);
+
+        show_line_of_cards(gameLogic.weather_manager.weather, 10, 210,250,false);
         window.display();
     }
 

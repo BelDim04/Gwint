@@ -68,6 +68,7 @@ public:
 };
 
 class Delete_card : public Strength_card {
+public:
     Delete_card(int Amount_of_strength, bool Can_be_changed,
                 std::string Name, std::string Filename_of_image, std::string Type_of_weapon);
 
