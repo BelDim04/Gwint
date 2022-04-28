@@ -66,6 +66,9 @@ public:
     std::vector<sf::Sprite> clickSprites;
 
     bool is_menu_open = true;
+    bool is_first_menu_open = true;
+    bool is_second_menu_open = false;
+    bool is_show_info_open = false;
 
     bool is_waiting = false;
 
@@ -75,6 +78,10 @@ public:
         parent_path+="/";
         textureHolder.load("Game_Table", parent_path+"src/Game_table.jpg");
         textureHolder.load("fold_button", parent_path+"src/fold.jpg");
+        textureHolder.load("Background", parent_path+"src/Background.jpg");
+        textureHolder.load("Button_start_game", parent_path+"src/Button_start_game.png");
+        textureHolder.load("Button_show_info", parent_path+"src/Igry_v_Novigrade.png");
+        textureHolder.load("Window_show_info", parent_path+"src/Igry_v_Novigrade.png");
         for(const auto& card: g.player1.hand){
             textureHolder.load(card->name, parent_path+card->filename_of_image);
         }
@@ -106,6 +113,33 @@ public:
                         is_waiting = false;
                         break;
                     }
+                    if(is_menu_open) {
+                        //если first menu is open
+                        //если нажали на show_info, переменная = 1
+                        //если нажали на start то second menu is open
+                        if(is_first_menu_open && !is_show_info_open) {
+                            sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                            sf::FloatRect start_bounds = sf::FloatRect(750, 600,
+                                                                       100, 50);
+                            sf::FloatRect info_bounds = sf::FloatRect (750, 550,
+                                                                       100, 50);
+                            if(start_bounds.contains(mouse)) {
+                                is_first_menu_open = false;
+                                is_second_menu_open = true;
+                            }
+                            if(info_bounds.contains(mouse)) {
+                                is_show_info_open = true;
+                            }
+
+                        }
+                        else if(is_first_menu_open && is_show_info_open) {
+                            is_show_info_open = false;
+                        }
+                        else {
+
+                        }
+                        return;
+                    }
                     bool moving = gameLogic.is_first_moving;
                     for(size_t i=0;i<clickSprites.size()-1;++i){
                         sf::Sprite sprite = clickSprites[i];
@@ -127,6 +161,11 @@ public:
                     if(gameLogic.is_first_moving != moving) is_waiting = true;
                     break;
                 }
+                /*case sf::Event::KeyPressed:{
+                    if(event.key.code == sf::Keyboard::Enter) {
+                        is_show_info_open = false;
+                    }
+                }*/
                 case sf::Event::Closed:{
                     window.close();
                     break;
@@ -151,11 +190,44 @@ public:
             window.display();
             return;
         }
-        /*if(is_menu_open){
-            main_menu();
+        if(is_menu_open){
+
+            sf::Sprite MenuSprite(textureHolder.get("Background"));
+            sf::Vector2f targetSize(900.0f, 700.0f); //целевой размер
+            MenuSprite.setScale(
+                    targetSize.x / MenuSprite.getLocalBounds().width,
+                    targetSize.y / MenuSprite.getLocalBounds().height);
+            window.draw(MenuSprite);
+            if(is_first_menu_open) {
+
+
+                sf::Sprite StartGameSprite(textureHolder.get("Button_start_game"));
+                StartGameSprite.setPosition(750, 600);
+                sf::Vector2f targetSizest(100.0f, 50.0f);
+                StartGameSprite.setScale(
+                        targetSizest.x / StartGameSprite.getLocalBounds().width,
+                        targetSizest.y / StartGameSprite.getLocalBounds().height);
+
+                sf::Sprite ButtonShowInfoSprite(textureHolder.get("Button_show_info"));
+                ButtonShowInfoSprite.setPosition(750, 550);
+                ButtonShowInfoSprite.setScale(
+                        targetSizest.x / ButtonShowInfoSprite.getLocalBounds().width,
+                        targetSizest.y / ButtonShowInfoSprite.getLocalBounds().height);
+
+                window.draw(StartGameSprite);
+                window.draw(ButtonShowInfoSprite);
+
+                if(is_show_info_open) {
+                    sf::Sprite InfoSprite(textureHolder.get("Window_show_info"));
+                    window.draw(InfoSprite);
+                }
+            }
+            else {
+
+            }
             window.display();
             return;
-        }*/
+        }
         sf::Sprite deskSprite(textureHolder.get("Game_Table"));
         //deskSprite.setScale(window.getSize().x/deskSprite.getLocalBounds().width, 6.0/7.0*window.getSize().y/deskSprite.getLocalBounds().height);
         window.draw(deskSprite);
@@ -186,7 +258,7 @@ public:
     }
 
     void show_line_of_cards(const std::vector<Card*>& cards, size_t start_x, size_t end_x, size_t y, bool clickable){
-        if(cards.size() ==0 ) {
+        if(cards.size() == 0 ) {
             return;
         }
         size_t delta = (end_x - start_x) / cards.size();
@@ -197,46 +269,5 @@ public:
             if(clickable) clickSprites.push_back(cardSprite);
             window.draw(cardSprite);
         }
-    }
-
-    void main_menu() {
-        std::string parent_path = std::filesystem::current_path().parent_path();
-        sf::Texture background, button_start_game, button_choose_cards, button_read_about, info_about;
-        background.loadFromFile(parent_path + "/src/Background.jpg");
-        //button_choose_cards.loadFromFile("filename");//эту можно пока не реализовывать, это так, на будущее
-        button_start_game.loadFromFile(parent_path + "/src/Button_start_game.png");
-        // button_read_about.loadFromFile("filename");
-        info_about.loadFromFile(parent_path + "/src/Igry_v_Novigrade.png");
-        sf::Sprite background_spr(background);
-        sf::Vector2f targetSize(1777.0f, 1000.0f); //целевой размер
-        background_spr.setScale(
-                targetSize.x / background_spr.getLocalBounds().width,
-                targetSize.y / background_spr.getLocalBounds().height);
-
-
-        sf::Sprite button_choose_cards_spr(button_choose_cards), button_start_game_spr(button_start_game),
-                button_read_about_spr(button_read_about), info_about_spr(info_about);
-
-        button_start_game_spr.setPosition(12, 12);
-        sf::Vector2f targetSizest(800.0f, 400.0f); //целевой размер
-        button_start_game_spr.setScale(
-                targetSizest.x / button_start_game_spr.getLocalBounds().width,
-                targetSizest.y / button_start_game_spr.getLocalBounds().height);
-
-
-        button_read_about_spr.setPosition(1, 1);
-
-        //button_choose_cards_spr.setPosition(1, 1);
-        //info_about_spr.setPosition(1, 1);
-        info_about_spr.setScale(
-                targetSize.x / info_about_spr.getLocalBounds().width,
-                targetSize.y / info_about_spr.getLocalBounds().height);
-        //Если нажимаешь на button_read_about, рисуем текстуру info_about_spr
-        //Если нажимаешь на choose_cards, открывается выбор колоды
-        //Если нажимаешь start_game, открывается выбор начала игры(т.е. выбираешь против бота или человека)
-        //window.draw(button_choose_cards_spr);
-        // window.draw(button_read_about_spr);
-        window.draw(background_spr);
-        window.draw(button_start_game_spr);
     }
 };
