@@ -532,7 +532,7 @@ public:
     }
 
     Delete_card Shirru = Delete_card(7, 1,
-      "Shirru", "src/Shirru", "siege");
+      "Shirru", "src/Shirru.jpg", "siege");
     std::vector<Delete_card> Shirru_vector;
     int index_Shirru = 0;
     void declare_Shirru() {
@@ -545,7 +545,7 @@ public:
     }
 
     Delete_card PrinceToad = Delete_card(9, 0,
-                                     "PrinceToad", "src/PrinceToad", "archer");
+                                     "PrinceToad", "src/PrinceToad.jpg", "archer");
     std::vector<Delete_card> PrinceToad_vector;
     int index_PrinceToad = 0;
     void declare_PrinceToad() {
