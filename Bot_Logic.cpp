@@ -4,7 +4,7 @@
 #include "Class_Game.h"
 #include "Class_Card.h"
 
-/*
+
 bool will_lose_if_pass(Game& game) {
     return (game.now_moving_hp() < 1);
 }
@@ -21,9 +21,9 @@ int assume_sum_strength_of_bot(Game& game) {
     Game copy(game.player1, game.player2, game.is_first_moving);
     int i = 0;
     while(i < copy.now_moving().hand.size()) {
-        if(copy.now_moving().hand[i].name != "Command Horn" || is_card_weather(copy.now_moving().hand[i].name)) {
-            copy.now_moving().hand[i].bot_set_where_lies(copy);
-            copy.make_turn(i, copy.now_moving().hand[i].where_lies);
+        if(copy.now_moving().hand[i]->name != "Command Horn" || is_card_weather(copy.now_moving().hand[i]->name)) {
+            copy.now_moving().hand[i]->bot_set_where_lies(copy);
+            copy.make_turn(i);
         }
         else {
             ++i;
@@ -37,7 +37,7 @@ int assume_sum_strength_of_bot(Game& game) {
 
 int find_useless_card(Game& game) {
     for(int i = 0; i < game.now_moving().hand.size(); ++i) {
-        //if(game.now_moving().hand[i].strength != -1 && game.now_moving().hand[i].strength < 3) return i;
+        if(game.now_moving().hand[i]->amount_of_strength_now != -1 && game.now_moving().hand[i]->amount_of_strength_now <= 4) return i;
     }
     return -1;
 }
@@ -58,7 +58,7 @@ bool should_bot_pass(Game& game) {
 }
 
 int bot_choose_card(Game& game) {
-    std::vector<Card>& hand = game.now_moving().hand;
+    std::vector<Card*>& hand = game.now_moving().hand;
     //простая версия
     //идея-для каждой карты смотрим как изменится баланс сил, и большее изменение - это то, что возвращаем
     //Game copy = game;
@@ -68,10 +68,13 @@ int bot_choose_card(Game& game) {
     //Еслм карта-шпион, надо класть её, но нужна проверка на то, является ли карта шпионом
     for(int i = 0; i < game.now_moving().hand.size(); ++i) {
         //сделать ход
-        Game copy = game;
+        Game copy = game;//не сработает
         dif = (game.now_moving().sum_strength - game.not_now_moving().sum_strength) -
                 (copy.now_moving().sum_strength - game.not_now_moving().sum_strength);
-        if(dif < 0 && !is_card_weather(game.now_moving().hand[i].name)) return i;
+        if(dif < 0 && !is_card_weather(game.now_moving().hand[i]->name))
+        {
+            return i;
+        }
         else if(dif > maxdif) {
             maxdif = dif;
             res = i;
@@ -89,8 +92,8 @@ void bot_move(Game& game) {//check
     }
     else if(game.now_moving().hand.size() * 2 < game.not_now_moving().hand.size() * 3)  {
         int k = find_useless_card(game);
-        game.now_moving().hand[k].bot_set_where_lies(game);
-        game.make_turn(k, game.now_moving().hand[k].where_lies);
+        game.now_moving().hand[k]->bot_set_where_lies(game);
+        game.make_turn(k);
     }
     else {
         int k = bot_choose_card(game);
@@ -98,8 +101,8 @@ void bot_move(Game& game) {//check
             game.now_moving().has_fold = true;
             return;
         }
-        game.now_moving().hand[k].bot_set_where_lies(game);
-        game.make_turn(k, game.now_moving().hand[k].where_lies);
+        game.now_moving().hand[k]->bot_set_where_lies(game);
+        game.make_turn(k);
     }
 }
-*/
+
