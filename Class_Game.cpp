@@ -3,9 +3,16 @@
 #include<vector>
 #include<string>
 #include <typeinfo>
+#include <algorithm>
+#include <time.h>
 
 Player::Player(std::vector<Card*> cards, bool is_bot) : is_bot(is_bot) {
     if(cards.size() != 0) {
+        srand(time(0));
+        for(int i = 0; i < cards.size(); ++i) {
+            int rnd = rand() % (cards.size() - 1);
+            std::swap(cards[i], cards[rnd]);
+        }
         for (size_t i = 0; i < amount_in_hand; ++i) {
             hand.push_back(cards[i]);
         }
