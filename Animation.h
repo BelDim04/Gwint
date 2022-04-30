@@ -35,6 +35,7 @@ public:
     bool choosing_been_bot_and_player = false;
     bool choosing_bot_difficulty = false;
     bool choosing_decks = false;
+    bool is_game_ended = false;
 
 
     bool is_waiting = false;

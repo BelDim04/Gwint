@@ -40,6 +40,8 @@ GameAnimation::GameAnimation(Game& g): window(sf::VideoMode(900, 700), "Test"), 
         textureHolder.load("Easy_dif", parent_path + "src/Eazy_dif.png");
         textureHolder.load("Normal_dif", parent_path + "src/Normal_dif.png");
         textureHolder.load("Hard_dif", parent_path + "src/Hard_dif.png");
+        textureHolder.load("Player2_win", parent_path + "src/Player2_win.png");
+        textureHolder.load("Player1_win", parent_path + "src/Player1_win.png");
         for(const auto& card: g.player1.hand){
             textureHolder.load(card->name, parent_path+card->filename_of_image);
         }
@@ -67,6 +69,11 @@ void GameAnimation::processEvents(){
     while (window.pollEvent(event)){
         switch (event.type) {
             case sf::Event::MouseButtonReleased:{
+                if(is_game_ended) {
+                    is_game_ended = false;
+                    is_menu_open = true;
+                    return;
+                }
                 if(is_waiting){
                     is_waiting = false;
                     break;
@@ -141,7 +148,7 @@ void GameAnimation::processEvents(){
                         if(choosing_decks) {
                             //здесь надо выбрать колоды игрокам, пока не делал
                             Player_deck_src src = Player_deck_src();
-                            gameLogic.player1 = src.player2;
+                            gameLogic.player1 = Player(src.deck_3, 0);
                             std::string parent_path = std::filesystem::current_path().parent_path();
                             parent_path+="/";
                             for(const auto& card: gameLogic.player1.hand){
@@ -150,6 +157,7 @@ void GameAnimation::processEvents(){
                             for(const auto& card: gameLogic.player1.deck){
                                 textureHolder.load(card->name, parent_path+card->filename_of_image);
                             }
+                            choosing_decks = false;
                             is_menu_open = false;
                         }
                     }
@@ -194,8 +202,16 @@ void GameAnimation::update(){
         gameLogic.on_round_ended();
     }
     if(gameLogic.is_game_ended()){
-        gameLogic.on_game_ended();
+        gameLogic.on_round_ended();
+        gameLogic.player1.hand.clear();
+        gameLogic.player1.deck.clear();
+        gameLogic.player1.reset.clear();
+        gameLogic.player2.hand.clear();
+        gameLogic.player2.deck.clear();
+        gameLogic.player2.reset.clear();
+        is_game_ended = true;
         is_menu_open = true;
+        is_first_menu_open = true;
     }
 }
 
@@ -280,7 +296,24 @@ void GameAnimation::render(){
                 window.draw(Hard_dif);
             }
             if(choosing_decks) {
-
+                //выбор колод
+            }
+            if(is_game_ended) {
+                sf::Vector2f targetSize(900.0f, 700.0f);
+                if(gameLogic.player1.hp != 0) {
+                    sf::Sprite player1_win(textureHolder.get("Player1_win"));
+                    player1_win.setScale(
+                            targetSize.x / player1_win.getLocalBounds().width,
+                            targetSize.y / player1_win.getLocalBounds().height);
+                    window.draw(player1_win);
+                }
+                else {
+                    sf::Sprite player2_win(textureHolder.get("Player2_win"));
+                    player2_win.setScale(
+                            targetSize.x / player2_win.getLocalBounds().width,
+                            targetSize.y / player2_win.getLocalBounds().height);
+                    window.draw(player2_win);
+                }
             }
         }
         window.display();
