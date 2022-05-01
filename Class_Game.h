@@ -6,12 +6,12 @@ class Card;
 
 class Buff_manager {
 public:
-    int buff_by_one_melee;
-    int buff_by_one_archer;
-    int buff_by_one_siege;
-    int buff_in_two_melee;
-    int buff_in_two_archer;
-    int buff_in_two_siege;
+    int buff_by_one_melee = 0;
+    int buff_by_one_archer = 0;
+    int buff_by_one_siege = 0;
+    int buff_in_two_melee = 1;
+    int buff_in_two_archer = 1;
+    int buff_in_two_siege = 1;
 };
 
 class Desk {
