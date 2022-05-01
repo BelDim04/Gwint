@@ -3,7 +3,43 @@
 
 class Src{
 public:
+    std::vector<Card*> Src_vector;
     Src() {
+        Src_vector.push_back(&Menno_Koegorn);
+        Src_vector.push_back(&Dikstra);
+        Src_vector.push_back(&Healer_of_Brown_Banner);
+        Src_vector.push_back(&Insane_Lugos);
+        Src_vector.push_back(&Leto_from_Guleto);
+        Src_vector.push_back(&Moorvan_Voorhis);
+        Src_vector.push_back(&Phillipa_Eilhart);
+        Src_vector.push_back(&Sabrine_Glevissig);
+        Src_vector.push_back(&Kaedven_siege_master);
+        Src_vector.push_back(&Sheldon_Skaggs);
+        Src_vector.push_back(&Stennis);
+        Src_vector.push_back(&Taler);
+        Src_vector.push_back(&Readan_trooper);
+        Src_vector.push_back(&Readan_trooper1);
+        Src_vector.push_back(&Ballista);
+        Src_vector.push_back(&Belly);
+        Src_vector.push_back(&Teabor_Eggerbraht);
+        Src_vector.push_back(&Archer_support);
+        Src_vector.push_back(&Avalakh);
+        Src_vector.push_back(&Bright_day);
+        Src_vector.push_back(&Ciri);
+        Src_vector.push_back(&Cold);
+        Src_vector.push_back(&Rain);
+        Src_vector.push_back(&Haze);
+        Src_vector.push_back(&Command_horn);
+        Src_vector.push_back(&Demon);
+        Src_vector.push_back(&Kagyr);
+        Src_vector.push_back(&Healer_Gavenkar);
+        Src_vector.push_back(&Lutik);
+        Src_vector.push_back(&Shelard);
+        Src_vector.push_back(&Siege_Support);
+        Src_vector.push_back(&Stephan_Skellin);
+        Src_vector.push_back(&Yorvet);
+        Src_vector.push_back(&Shirru);
+        Src_vector.push_back(&PrinceToad);
         declare_Menno_Koegorn();
         declare_Dikstra();
         declare_Healer_of_Brown_Banner();
@@ -474,7 +510,7 @@ public:
 
 
     Spy_card Shelard = Spy_card(7, 1,
-    "Sherald", "src/Sherald.jpg", "melee");
+    "Sherald", "src/Shelard.jpg", "melee");
     std::vector<Spy_card> Shelard_vector;
     int index_Shelard = 0;
     void declare_Shelard() {

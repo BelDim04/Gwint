@@ -28,7 +28,7 @@ public:
 
 class Player {
 public:
-    static const size_t amount_in_hand = 3;
+    static const size_t amount_in_hand = 6;
     std::vector<Card*> hand;
     std::vector<Card*> reset;
     std::vector<Card*> deck;
@@ -42,7 +42,17 @@ public:
     bool has_fold = false;
     int hp = 2;
     Player(std::vector<Card*> cards, bool is_bot);
-
+    Player& operator=(Player p2) {
+        hand.clear();
+        deck.clear();
+        for(int i = 0; i < p2.hand.size(); ++i) {
+            hand.push_back(p2.hand[i]);
+        }
+        for(int i = 0; i < p2.deck.size(); ++i) {
+            deck.push_back(p2.deck[i]);
+        }
+        return *this;
+    }
     void clear();
 };
 

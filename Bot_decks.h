@@ -133,8 +133,8 @@ public:
         declare_deck_weak();
         declare_deck_normal();
         declare_deck_hard();
-        player_weak = Player(deck_weak, 0);
-        player_normal = Player(deck_normal, 0);
-        player_hard = Player(deck_hard, 0);
+        player_weak = Player(deck_weak, 1);
+        player_normal = Player(deck_normal, 1);
+        player_hard = Player(deck_hard, 1);
     }
 };

@@ -28,6 +28,10 @@ public:
 
     std::vector<sf::Sprite> clickSprites;
 
+    Src src = Src();
+    Player_deck_src Player_src = Player_deck_src();
+    Bot_deck_src Bot_src = Bot_deck_src();
+
     bool is_menu_open = true;
     bool is_first_menu_open = true;
     bool is_second_menu_open = false;

@@ -25,7 +25,6 @@ sf::Texture& TextureHolder::get(std::string name){
     return *found->second;
 }
 
-
 GameAnimation::GameAnimation(Game& g): window(sf::VideoMode(900, 700), "Test"), gameLogic(g){
         std::string parent_path = std::filesystem::current_path().parent_path();
         parent_path+="/";
@@ -42,16 +41,7 @@ GameAnimation::GameAnimation(Game& g): window(sf::VideoMode(900, 700), "Test"), 
         textureHolder.load("Hard_dif", parent_path + "src/Hard_dif.png");
         textureHolder.load("Player2_win", parent_path + "src/Player2_win.png");
         textureHolder.load("Player1_win", parent_path + "src/Player1_win.png");
-        for(const auto& card: g.player1.hand){
-            textureHolder.load(card->name, parent_path+card->filename_of_image);
-        }
-        for(const auto& card: g.player2.hand){
-            textureHolder.load(card->name, parent_path+card->filename_of_image);
-        }
-        for(const auto& card: g.player1.deck){
-            textureHolder.load(card->name, parent_path+card->filename_of_image);
-        }
-        for(const auto& card: g.player2.deck){
+        for(const auto& card: src.Src_vector){
             textureHolder.load(card->name, parent_path+card->filename_of_image);
         }
 }
@@ -115,31 +105,22 @@ void GameAnimation::processEvents(){
                             }
                         }
                         if(choosing_bot_difficulty) {
-                            Bot_deck_src bot = Bot_deck_src();
                             sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                             sf::FloatRect easy = sf::FloatRect(330, 325, 70, 50);
                             sf::FloatRect normal = sf::FloatRect(410, 325, 70, 50);
                             sf::FloatRect hard = sf::FloatRect (490, 325, 70, 50);
                             if(easy.contains(mouse)) {
-                                gameLogic.player2 = bot.player_weak;
-                                std::string parent_path = std::filesystem::current_path().parent_path();
-                                parent_path+="/";
-                                for(const auto& card: gameLogic.player2.hand){
-                                    textureHolder.load(card->name, parent_path+card->filename_of_image);
-                                }
-                                for(const auto& card: gameLogic.player2.deck){
-                                    textureHolder.load(card->name, parent_path+card->filename_of_image);
-                                }
+                                gameLogic.player2 = Bot_src.player_weak;
                                 choosing_bot_difficulty = false;
                                 is_menu_open = false;
                             }
                             if(normal.contains(mouse)) {
-                                gameLogic.player2 = bot.player_normal;
+                                gameLogic.player2 = Bot_src.player_normal;
                                 choosing_bot_difficulty = false;
                                 is_menu_open = false;
                             }
                             if(hard.contains(mouse)) {
-                                gameLogic.player2 = bot.player_hard;
+                                gameLogic.player2 = Bot_src.player_hard;
                                 choosing_bot_difficulty = false;
                                 is_menu_open = false;
                             }
@@ -147,16 +128,7 @@ void GameAnimation::processEvents(){
                         }
                         if(choosing_decks) {
                             //здесь надо выбрать колоды игрокам, пока не делал
-                            Player_deck_src src = Player_deck_src();
-                            gameLogic.player1 = Player(src.deck_3, 0);
-                            std::string parent_path = std::filesystem::current_path().parent_path();
-                            parent_path+="/";
-                            for(const auto& card: gameLogic.player1.hand){
-                                textureHolder.load(card->name, parent_path+card->filename_of_image);
-                            }
-                            for(const auto& card: gameLogic.player1.deck){
-                                textureHolder.load(card->name, parent_path+card->filename_of_image);
-                            }
+                            gameLogic.player1 = Player(Player_src.deck_1, 0);
                             choosing_decks = false;
                             is_menu_open = false;
                         }
@@ -197,6 +169,7 @@ void GameAnimation::processEvents(){
     }
 }
 
+//.................................................................................................................................................//
 void GameAnimation::update(){
     if(gameLogic.is_round_ended()){
         gameLogic.on_round_ended();
