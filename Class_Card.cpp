@@ -41,7 +41,7 @@ void Card::delete_card(Game &game) {
 
 Strength_card::Strength_card(int Amount_of_strength, bool Can_be_changed,
                              std::string Name, std::string Filename_of_image, std::string Type_of_weapon) :
-        Card(Name, Filename_of_image, amount_of_strength_now),
+        Card(Name, Filename_of_image, Amount_of_strength),
         base_amount_of_strength(Amount_of_strength), can_be_changed(Can_be_changed), type_of_weapon(Type_of_weapon) {};
 
 int Strength_card::recalculate(Game& game) {

@@ -195,7 +195,6 @@ void GameAnimation::render(){
         return;
     }
     if(is_menu_open){
-
         sf::Sprite MenuSprite(textureHolder.get("Background"));
         sf::Vector2f targetSize(900.0f, 700.0f); //целевой размер
         MenuSprite.setScale(
@@ -325,6 +324,8 @@ void GameAnimation::show_line_of_cards(const std::vector<Card*>& cards, size_t s
     if(cards.size() == 0 ) {
         return;
     }
+    std::string parent_path = std::filesystem::current_path().parent_path();
+    parent_path+="/";
     size_t delta = (end_x - start_x) / cards.size();
     for(size_t i=0; i<cards.size(); ++i){
         sf::Sprite cardSprite(textureHolder.get(cards[i]->name));
@@ -332,6 +333,18 @@ void GameAnimation::show_line_of_cards(const std::vector<Card*>& cards, size_t s
         cardSprite.setScale(1.0/6.0, 1.0/6.0);
         if(clickable) clickSprites.push_back(cardSprite);
         window.draw(cardSprite);
+        sf::Font font;
+        font.loadFromFile(parent_path + "src/font.ttf");
+        sf::Text strengthText;
+        strengthText.setFont(font);
+        std::string s = std::to_string(cards[i]->amount_of_strength_now);
+        //strengthText.setOutlineColor(sf::Color::White);
+        //strengthText.setColor(sf::Color::White);
+        strengthText.setString(s);
+        strengthText.setCharacterSize(12);
+        strengthText.setFillColor(sf::Color::Red);
+        strengthText. setPosition(start_x + i * delta, y);
+        window.draw(strengthText);
     }
-}
 
+}
