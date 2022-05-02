@@ -87,6 +87,14 @@ std::vector<Card*>& Game::find_vector(std::string where_lies) {
 
 
 void Game::recalculate() {
+    now_moving().sum_strength = 0;
+    now_moving().melee_sum_strength = 0;
+    now_moving().archer_sum_strength = 0;
+    now_moving().siege_sum_strength = 0;
+    not_now_moving().sum_strength = 0;
+    not_now_moving().melee_sum_strength = 0;
+    not_now_moving().archer_sum_strength = 0;
+    not_now_moving().siege_sum_strength = 0;
     for (int i = 0; i < now_moving().desk.strength_melee.size(); ++i) {
         int a = now_moving().desk.strength_melee[i]->recalculate(*this);
         now_moving().sum_strength+=a;
@@ -262,6 +270,18 @@ void Game::on_round_ended() {
     player2.has_fold = false;
     is_first_moving = ! is_first_start_round;
     is_first_start_round = is_first_moving;
+    player1.desk.buff_manager.buff_by_one_archer = 0;
+    player1.desk.buff_manager.buff_by_one_melee = 0;
+    player1.desk.buff_manager.buff_by_one_siege = 0;
+    player1.desk.buff_manager.buff_in_two_archer = 1;
+    player1.desk.buff_manager.buff_in_two_melee = 1;
+    player1.desk.buff_manager.buff_in_two_siege = 1;
+    player2.desk.buff_manager.buff_by_one_archer = 0;
+    player2.desk.buff_manager.buff_by_one_melee = 0;
+    player2.desk.buff_manager.buff_by_one_siege = 0;
+    player2.desk.buff_manager.buff_in_two_archer = 1;
+    player2.desk.buff_manager.buff_in_two_melee = 1;
+    player2.desk.buff_manager.buff_in_two_siege = 1;
 }
 
 void Game::on_game_ended() {
