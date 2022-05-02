@@ -1,3 +1,4 @@
+#pragma once
 #include<iostream>
 #include<vector>
 
@@ -5,47 +6,59 @@ class Card;
 
 class Buff_manager {
 public:
-    int buff_by_one_melee;
-    int buff_by_one_archer;
-    int buff_by_one_siege;
-    int buff_in_two_melee;
-    int buff_in_two_archer;
-    int buff_in_two_siege;
+    int buff_by_one_melee = 0;
+    int buff_by_one_archer = 0;
+    int buff_by_one_siege = 0;
+    int buff_in_two_melee = 1;
+    int buff_in_two_archer = 1;
+    int buff_in_two_siege = 1;
 };
 
 class Desk {
 public:
-    std::vector<Card> buff_melee;
-    std::vector<Card> buff_archer;
-    std::vector<Card> buff_siege;
-    std::vector<Card> strength_melee;
-    std::vector<Card> strength_archer;
-    std::vector<Card> strength_siege;
+    std::vector<Card*> buff_melee;
+    std::vector<Card*> buff_archer;
+    std::vector<Card*> buff_siege;
+    std::vector<Card*> strength_melee;
+    std::vector<Card*> strength_archer;
+    std::vector<Card*> strength_siege;
     Buff_manager buff_manager;
 };
 
 
 class Player {
 public:
-    static const size_t amount_in_hand = 10;
-    std::vector<Card> hand;
-    std::vector<Card> reset;
-    std::vector<Card> deck;
+    static const size_t amount_in_hand = 6;
+    std::vector<Card*> hand;
+    std::vector<Card*> reset;
+    std::vector<Card*> deck;
     Desk desk;
-    const bool is_bot;
+     bool is_bot;
     //type_of_fraction
     int sum_strength = 0;
     int melee_sum_strength = 0;
     int archer_sum_strength = 0;
     int siege_sum_strength = 0;
     bool has_fold = false;
-    Player(std::vector<Card> cards, bool is_bot);
-
+    int hp = 2;
+    Player(std::vector<Card*> cards, bool is_bot);
+    Player& operator=(Player p2) {
+        hand.clear();
+        deck.clear();
+        for(int i = 0; i < p2.hand.size(); ++i) {
+            hand.push_back(p2.hand[i]);
+        }
+        for(int i = 0; i < p2.deck.size(); ++i) {
+            deck.push_back(p2.deck[i]);
+        }
+        return *this;
+    }
+    void clear();
 };
 
 class Weather_manager {
 public:
-    std::vector<Card> weather;
+    std::vector<Card*> weather;
     bool is_weather_bad_melee;
     bool is_weather_bad_archer;
     bool is_weather_bad_siege;
@@ -56,24 +69,23 @@ class Game {
 public:
     Player player1;
     Player player2;
-    int player1_hp = 2;
-    int player2_hp = 2;
     bool is_first_moving;
+    bool is_first_start_round;
     Weather_manager weather_manager;
 
     Game(Player p1, Player p2, bool is_first_moving);
 
-    bool both_alive();
+    bool is_game_ended();
     void switch_turn();
     Player& now_moving();
     std::string str_now_moving();
     Player& not_now_moving();
     std::string str_not_now_moving();
 
-    std::vector<Card>& find_vector(std::string where_lies);
+    std::vector<Card*>& find_vector(std::string where_lies);
     void recalculate();
 
-    std::vector<Card>& find_weather();
+    std::vector<Card*>& find_weather();
 
     bool is_weather_bad(std::string where_lies);
 
@@ -85,7 +97,7 @@ public:
 
     size_t choose_card();
 
-    void make_turn(size_t card_index, std::string destination);
+    void move_card(size_t card_index, std::string destination);
 
     void spy_move(int a, int b);
 
@@ -96,5 +108,13 @@ public:
     //new functions
     int now_moving_hp();
     int not_now_moving_hp();
+
+    void make_turn(size_t n);
+
+    bool is_round_ended();
+
+    void on_round_ended();
+
+    void on_game_ended();
 };
 

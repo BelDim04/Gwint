@@ -8,8 +8,6 @@
 #include "Class_Game.h"
 #include "Card_src.h"
 #include<filesystem>
-#include "Bot_decks.h"
-#include"Player_decks.h"
 #include "Animation.h"
 
 
@@ -25,7 +23,6 @@ sf::Texture& TextureHolder::get(std::string name){
     return *found->second;
 }
 
-
 GameAnimation::GameAnimation(Game& g): window(sf::VideoMode(900, 700), "Test"), gameLogic(g){
         std::string parent_path = std::filesystem::current_path().parent_path();
         parent_path+="/";
@@ -40,16 +37,9 @@ GameAnimation::GameAnimation(Game& g): window(sf::VideoMode(900, 700), "Test"), 
         textureHolder.load("Easy_dif", parent_path + "src/Eazy_dif.png");
         textureHolder.load("Normal_dif", parent_path + "src/Normal_dif.png");
         textureHolder.load("Hard_dif", parent_path + "src/Hard_dif.png");
-        for(const auto& card: g.player1.hand){
-            textureHolder.load(card->name, parent_path+card->filename_of_image);
-        }
-        for(const auto& card: g.player2.hand){
-            textureHolder.load(card->name, parent_path+card->filename_of_image);
-        }
-        for(const auto& card: g.player1.deck){
-            textureHolder.load(card->name, parent_path+card->filename_of_image);
-        }
-        for(const auto& card: g.player2.deck){
+        textureHolder.load("Player2_win", parent_path + "src/Player2_win.png");
+        textureHolder.load("Player1_win", parent_path + "src/Player1_win.png");
+        for(const auto& card: src.Src_vector){
             textureHolder.load(card->name, parent_path+card->filename_of_image);
         }
 }
@@ -67,6 +57,11 @@ void GameAnimation::processEvents(){
     while (window.pollEvent(event)){
         switch (event.type) {
             case sf::Event::MouseButtonReleased:{
+                if(is_game_ended) {
+                    is_game_ended = false;
+                    is_menu_open = true;
+                    return;
+                }
                 if(is_waiting){
                     is_waiting = false;
                     break;
@@ -108,31 +103,22 @@ void GameAnimation::processEvents(){
                             }
                         }
                         if(choosing_bot_difficulty) {
-                            Bot_deck_src bot = Bot_deck_src();
                             sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                             sf::FloatRect easy = sf::FloatRect(330, 325, 70, 50);
                             sf::FloatRect normal = sf::FloatRect(410, 325, 70, 50);
                             sf::FloatRect hard = sf::FloatRect (490, 325, 70, 50);
                             if(easy.contains(mouse)) {
-                                gameLogic.player2 = bot.player_weak;
-                                std::string parent_path = std::filesystem::current_path().parent_path();
-                                parent_path+="/";
-                                for(const auto& card: gameLogic.player2.hand){
-                                    textureHolder.load(card->name, parent_path+card->filename_of_image);
-                                }
-                                for(const auto& card: gameLogic.player2.deck){
-                                    textureHolder.load(card->name, parent_path+card->filename_of_image);
-                                }
+                                gameLogic.player2 = Bot_src.player_weak;
                                 choosing_bot_difficulty = false;
                                 is_menu_open = false;
                             }
                             if(normal.contains(mouse)) {
-                                gameLogic.player2 = bot.player_normal;
+                                gameLogic.player2 = Bot_src.player_normal;
                                 choosing_bot_difficulty = false;
                                 is_menu_open = false;
                             }
                             if(hard.contains(mouse)) {
-                                gameLogic.player2 = bot.player_hard;
+                                gameLogic.player2 = Bot_src.player_hard;
                                 choosing_bot_difficulty = false;
                                 is_menu_open = false;
                             }
@@ -140,16 +126,8 @@ void GameAnimation::processEvents(){
                         }
                         if(choosing_decks) {
                             //здесь надо выбрать колоды игрокам, пока не делал
-                            Player_deck_src src = Player_deck_src();
-                            gameLogic.player1 = src.player2;
-                            std::string parent_path = std::filesystem::current_path().parent_path();
-                            parent_path+="/";
-                            for(const auto& card: gameLogic.player1.hand){
-                                textureHolder.load(card->name, parent_path+card->filename_of_image);
-                            }
-                            for(const auto& card: gameLogic.player1.deck){
-                                textureHolder.load(card->name, parent_path+card->filename_of_image);
-                            }
+                            gameLogic.player1 = Player(Player_src.deck_1, 0);
+                            choosing_decks = false;
                             is_menu_open = false;
                         }
                     }
@@ -189,13 +167,22 @@ void GameAnimation::processEvents(){
     }
 }
 
+//.................................................................................................................................................//
 void GameAnimation::update(){
     if(gameLogic.is_round_ended()){
         gameLogic.on_round_ended();
     }
     if(gameLogic.is_game_ended()){
-        gameLogic.on_game_ended();
+        gameLogic.on_round_ended();
+        gameLogic.player1.hand.clear();
+        gameLogic.player1.deck.clear();
+        gameLogic.player1.reset.clear();
+        gameLogic.player2.hand.clear();
+        gameLogic.player2.deck.clear();
+        gameLogic.player2.reset.clear();
+        is_game_ended = true;
         is_menu_open = true;
+        is_first_menu_open = true;
     }
 }
 
@@ -206,7 +193,6 @@ void GameAnimation::render(){
         return;
     }
     if(is_menu_open){
-
         sf::Sprite MenuSprite(textureHolder.get("Background"));
         sf::Vector2f targetSize(900.0f, 700.0f); //целевой размер
         MenuSprite.setScale(
@@ -280,7 +266,24 @@ void GameAnimation::render(){
                 window.draw(Hard_dif);
             }
             if(choosing_decks) {
-
+                //выбор колод
+            }
+            if(is_game_ended) {
+                sf::Vector2f targetSize(900.0f, 700.0f);
+                if(gameLogic.player1.hp != 0) {
+                    sf::Sprite player1_win(textureHolder.get("Player1_win"));
+                    player1_win.setScale(
+                            targetSize.x / player1_win.getLocalBounds().width,
+                            targetSize.y / player1_win.getLocalBounds().height);
+                    window.draw(player1_win);
+                }
+                else {
+                    sf::Sprite player2_win(textureHolder.get("Player2_win"));
+                    player2_win.setScale(
+                            targetSize.x / player2_win.getLocalBounds().width,
+                            targetSize.y / player2_win.getLocalBounds().height);
+                    window.draw(player2_win);
+                }
             }
         }
         window.display();
@@ -312,6 +315,47 @@ void GameAnimation::render(){
     show_line_of_cards(otherPlayer.desk.buff_archer, 265, 265, 0, false);
 
     show_line_of_cards(gameLogic.weather_manager.weather, 10, 210,250,false);
+
+
+    std::string parent_path = std::filesystem::current_path().parent_path();
+    parent_path+="/";
+    sf::Font font;
+    font.loadFromFile(parent_path + "src/font.ttf");
+
+    sf::Text strength1;
+    strength1.setFont(font);
+    strength1.setString(std::to_string(gameLogic.now_moving().sum_strength));
+    strength1.setCharacterSize(40);
+    strength1.setFillColor(sf::Color::Blue);
+    strength1. setPosition(90, 420);
+    window.draw(strength1);
+
+    sf::Text strength2;
+    strength2.setFont(font);
+    strength2.setString(std::to_string(gameLogic.not_now_moving().sum_strength));
+    strength2.setCharacterSize(40);
+    strength2.setFillColor(sf::Color::Blue);
+    strength2. setPosition(90, 130);
+    window.draw(strength2);
+
+    sf::Text hp1;
+    hp1.setFont(font);
+    hp1.setString(std::to_string(gameLogic.now_moving().sum_strength));
+    hp1.setStyle(sf::Text::Style::Bold);
+    hp1.setCharacterSize(40);
+    hp1.setFillColor(sf::Color::Yellow);
+    hp1. setPosition(840, 380);
+    window.draw(hp1);
+
+    sf::Text hp2;
+    hp2.setFont(font);
+    hp2.setString(std::to_string(gameLogic.not_now_moving().sum_strength));
+    hp2.setStyle(sf::Text::Style::Bold);
+    hp2.setCharacterSize(40);
+    hp2.setFillColor(sf::Color::Yellow);
+    hp2. setPosition(840, 170);
+    window.draw(hp2);
+
     window.display();
 }
 
@@ -319,6 +363,8 @@ void GameAnimation::show_line_of_cards(const std::vector<Card*>& cards, size_t s
     if(cards.size() == 0 ) {
         return;
     }
+    std::string parent_path = std::filesystem::current_path().parent_path();
+    parent_path+="/";
     size_t delta = (end_x - start_x) / cards.size();
     for(size_t i=0; i<cards.size(); ++i){
         sf::Sprite cardSprite(textureHolder.get(cards[i]->name));
@@ -326,6 +372,18 @@ void GameAnimation::show_line_of_cards(const std::vector<Card*>& cards, size_t s
         cardSprite.setScale(1.0/6.0, 1.0/6.0);
         if(clickable) clickSprites.push_back(cardSprite);
         window.draw(cardSprite);
+        sf::Font font;
+        font.loadFromFile(parent_path + "src/font.ttf");
+        sf::Text strengthText;
+        strengthText.setFont(font);
+        std::string s = std::to_string(cards[i]->amount_of_strength_now);
+        //strengthText.setOutlineColor(sf::Color::White);
+        //strengthText.setColor(sf::Color::White);
+        strengthText.setString(s);
+        strengthText.setCharacterSize(10);
+        strengthText.setFillColor(sf::Color::Red);
+        strengthText. setPosition(start_x + i * delta + 5, y + 1);
+        window.draw(strengthText);
     }
-}
 
+}
