@@ -8,8 +8,6 @@
 #include "Class_Game.h"
 #include "Card_src.h"
 #include<filesystem>
-#include "Bot_decks.h"
-#include"Player_decks.h"
 #include "Animation.h"
 
 
@@ -317,6 +315,47 @@ void GameAnimation::render(){
     show_line_of_cards(otherPlayer.desk.buff_archer, 265, 265, 0, false);
 
     show_line_of_cards(gameLogic.weather_manager.weather, 10, 210,250,false);
+
+
+    std::string parent_path = std::filesystem::current_path().parent_path();
+    parent_path+="/";
+    sf::Font font;
+    font.loadFromFile(parent_path + "src/font.ttf");
+
+    sf::Text strength1;
+    strength1.setFont(font);
+    strength1.setString(std::to_string(gameLogic.now_moving().sum_strength));
+    strength1.setCharacterSize(40);
+    strength1.setFillColor(sf::Color::Blue);
+    strength1. setPosition(90, 420);
+    window.draw(strength1);
+
+    sf::Text strength2;
+    strength2.setFont(font);
+    strength2.setString(std::to_string(gameLogic.not_now_moving().sum_strength));
+    strength2.setCharacterSize(40);
+    strength2.setFillColor(sf::Color::Blue);
+    strength2. setPosition(90, 130);
+    window.draw(strength2);
+
+    sf::Text hp1;
+    hp1.setFont(font);
+    hp1.setString(std::to_string(gameLogic.now_moving().sum_strength));
+    hp1.setStyle(sf::Text::Style::Bold);
+    hp1.setCharacterSize(40);
+    hp1.setFillColor(sf::Color::Yellow);
+    hp1. setPosition(840, 380);
+    window.draw(hp1);
+
+    sf::Text hp2;
+    hp2.setFont(font);
+    hp2.setString(std::to_string(gameLogic.not_now_moving().sum_strength));
+    hp2.setStyle(sf::Text::Style::Bold);
+    hp2.setCharacterSize(40);
+    hp2.setFillColor(sf::Color::Yellow);
+    hp2. setPosition(840, 170);
+    window.draw(hp2);
+
     window.display();
 }
 
@@ -341,9 +380,9 @@ void GameAnimation::show_line_of_cards(const std::vector<Card*>& cards, size_t s
         //strengthText.setOutlineColor(sf::Color::White);
         //strengthText.setColor(sf::Color::White);
         strengthText.setString(s);
-        strengthText.setCharacterSize(12);
+        strengthText.setCharacterSize(10);
         strengthText.setFillColor(sf::Color::Red);
-        strengthText. setPosition(start_x + i * delta, y);
+        strengthText. setPosition(start_x + i * delta + 5, y + 1);
         window.draw(strengthText);
     }
 

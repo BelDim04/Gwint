@@ -7,7 +7,7 @@
 #include <time.h>
 
 Player::Player(std::vector<Card*> cards, bool is_bot) : is_bot(is_bot) {
-    if(cards.size() != 0) {
+    if(!cards.empty()) {
         srand(time(0));
         for(int i = 0; i < cards.size(); ++i) {
             int rnd = rand() % (cards.size() - 1);

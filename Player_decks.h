@@ -4,7 +4,6 @@
 
 class Player_deck_src {
 private:
-    std::vector<Card*> deck_1;
     std::vector<Card*> deck_2;
     std::vector<Card*> deck_3;
     std::vector<Card*> empty;
@@ -131,4 +130,6 @@ public:
         player2 = Player(deck_2, 0);
         player3 = Player(deck_3, 0);
     }
+
+    std::vector<Card*> deck_1;
 };
