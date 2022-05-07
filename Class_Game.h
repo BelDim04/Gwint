@@ -42,6 +42,7 @@ public:
     bool has_fold = false;
     int hp = 2;
     Player(std::vector<Card*> cards, bool is_bot);
+    Player();
     Player& operator=(Player p2) {
         hand.clear();
         deck.clear();
@@ -98,6 +99,7 @@ public:
     Weather_manager weather_manager;
 
     Game(Player p1, Player p2, bool is_first_moving);
+    Game(bool is_first_moving);
 
     bool is_game_ended();
     void switch_turn();

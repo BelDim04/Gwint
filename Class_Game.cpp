@@ -35,7 +35,9 @@ void Player::clear() {
     desk.strength_archer.clear();
     reset.insert(reset.end(), desk.strength_siege.begin(), desk.strength_siege.end());
     desk.strength_siege.clear();
-};
+}
+
+Player::Player() = default;
 
 Weather_manager::Weather_manager() {
     weather = {};
@@ -287,3 +289,5 @@ void Game::on_round_ended() {
 void Game::on_game_ended() {
 
 }
+
+Game::Game(bool is_first_moving): is_first_moving(is_first_moving){};
