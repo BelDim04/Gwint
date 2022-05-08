@@ -21,7 +21,7 @@ public:
     }
 
     int assume_sum_strength_of_bot(Game &game) {
-        Game copy(game.player1, game.player2, game.is_first_moving);
+        Game copy = game;
         int i = 0;
         while (i < copy.now_moving().hand.size()) {
             if (copy.now_moving().hand[i]->name != "Command Horn" || is_card_weather(copy.now_moving().hand[i]->name)) {
@@ -48,7 +48,7 @@ public:
 
     bool should_bot_pass(Game &game) {
         if (will_lose_if_pass(game)) return false;
-        int assume_sum_strength_of_human = 4 * game.not_now_moving().hand.size();
+        int assume_sum_strength_of_human = 3 * game.not_now_moving().hand.size();
         if (assume_sum_strength_of_human + game.not_now_moving().sum_strength > assume_sum_strength_of_bot(game)) {
             return true;
         }
@@ -67,14 +67,17 @@ public:
         //идея-для каждой карты смотрим как изменится баланс сил, и большее изменение - это то, что возвращаем
         //Game copy = game;
         int maxdif = 0;
-        int dif;
-        int res;
+        int dif = 0;
+        int res = -1;
+        int t = game.now_moving().hand.size();
         //Еслм карта-шпион, надо класть её, но нужна проверка на то, является ли карта шпионом
+        std::cout<<game.now_moving().hand.size();
         for (int i = 0; i < game.now_moving().hand.size(); ++i) {
             //сделать ход
             Game copy = game;//не сработает
+            copy.make_turn(i);
             dif = (game.now_moving().sum_strength - game.not_now_moving().sum_strength) -
-                  (copy.now_moving().sum_strength - game.not_now_moving().sum_strength);
+                  (copy.now_moving().sum_strength - copy.not_now_moving().sum_strength);
             if (dif < 0 && !is_card_weather(game.now_moving().hand[i]->name)) {
                 return i;
             } else if (dif > maxdif) {
@@ -88,7 +91,7 @@ public:
     }
 
     void bot_move(Game &game) {//check
-        if (should_bot_pass(game)) {
+       if (should_bot_pass(game)) {
             game.now_moving().has_fold = true;
             game.switch_turn();
             return;
