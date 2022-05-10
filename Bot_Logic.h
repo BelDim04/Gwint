@@ -103,6 +103,7 @@ public:
             int k = bot_choose_card(game);
             if (k == -1) {
                 game.now_moving().has_fold = true;
+                game.switch_turn();
                 return;
             }
             game.now_moving().hand[k]->bot_set_where_lies(game);

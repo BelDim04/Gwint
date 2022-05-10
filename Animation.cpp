@@ -165,9 +165,6 @@ void GameAnimation::processEvents(){
                     gameLogic.switch_turn();
                 }
                 if(gameLogic.is_first_moving != moving && !gameLogic.now_moving().is_bot) is_waiting = true;
-                if(gameLogic.now_moving().is_bot) {
-                    Bot_logic().bot_move(gameLogic);
-                }
                 break;
             }
                 /*case sf::Event::KeyPressed:{
@@ -323,6 +320,10 @@ void GameAnimation::render(){
             }
         }
         window.display();
+        return;
+    }
+    if (gameLogic.now_moving().is_bot) {
+        Bot_logic().bot_move(gameLogic);
         return;
     }
     Player& curPlayer = gameLogic.now_moving();
