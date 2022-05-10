@@ -97,6 +97,11 @@ public:
             return;
         } else if (game.now_moving().hand.size() * 2 < game.not_now_moving().hand.size() * 3) {
             int k = find_useless_card(game);
+            if(k == -1) {
+                game.now_moving().has_fold = true;
+                game.switch_turn();
+                return;
+            }
             game.now_moving().hand[k]->bot_set_where_lies(game);
             game.make_turn(k);
         } else {
