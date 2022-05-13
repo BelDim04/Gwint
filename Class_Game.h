@@ -42,16 +42,41 @@ public:
     bool has_fold = false;
     int hp = 2;
     Player(std::vector<Card*> cards, bool is_bot);
+    Player();
     Player& operator=(Player p2) {
         hand.clear();
         deck.clear();
+        desk.strength_archer.clear();
+        desk.strength_melee.clear();
+        desk.strength_siege.clear();
+        desk.buff_archer.clear();
+        desk.buff_melee.clear();
+        desk.buff_siege.clear();
+        is_bot = p2.is_bot;
         for(int i = 0; i < p2.hand.size(); ++i) {
             hand.push_back(p2.hand[i]);
         }
         for(int i = 0; i < p2.deck.size(); ++i) {
             deck.push_back(p2.deck[i]);
         }
-        return *this;
+        for(int i = 0; i < p2.desk.strength_archer.size(); ++i) {
+            desk.strength_archer.push_back(p2.desk.strength_archer[i]);
+        }
+        for(int i = 0; i < p2.desk.strength_melee.size(); ++i) {
+            desk.strength_melee.push_back(p2.desk.strength_melee[i]);
+        }
+        for(int i = 0; i < p2.desk.strength_archer.size(); ++i) {
+            desk.strength_siege.push_back(p2.desk.strength_siege[i]);
+        }
+        for(int i = 0; i < p2.desk.buff_archer.size(); ++i) {
+            desk.buff_archer.push_back(p2.desk.buff_archer[i]);
+        }
+        for(int i = 0; i < p2.desk.buff_melee.size(); ++i) {
+            desk.buff_melee.push_back(p2.desk.buff_melee[i]);
+        }
+        for(int i = 0; i < p2.desk.buff_archer.size(); ++i) {
+            desk.buff_siege.push_back(p2.desk.buff_siege[i]);
+        }
     }
     void clear();
 };
@@ -74,6 +99,7 @@ public:
     Weather_manager weather_manager;
 
     Game(Player p1, Player p2, bool is_first_moving);
+    Game(bool is_first_moving);
 
     bool is_game_ended();
     void switch_turn();

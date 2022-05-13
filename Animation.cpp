@@ -37,6 +37,9 @@ GameAnimation::GameAnimation(Game& g): window(sf::VideoMode(900, 700), "Test"), 
         textureHolder.load("Easy_dif", parent_path + "src/Eazy_dif.png");
         textureHolder.load("Normal_dif", parent_path + "src/Normal_dif.png");
         textureHolder.load("Hard_dif", parent_path + "src/Hard_dif.png");
+        textureHolder.load("Deck1", parent_path + "src/Eazy_dif.png");
+        textureHolder.load("Deck2", parent_path + "src/Normal_dif.png");
+        textureHolder.load("Deck3", parent_path + "src/Hard_dif.png");
         textureHolder.load("Player2_win", parent_path + "src/Player2_win.png");
         textureHolder.load("Player1_win", parent_path + "src/Player1_win.png");
         for(const auto& card: src.Src_vector){
@@ -60,7 +63,7 @@ void GameAnimation::processEvents(){
                 if(is_game_ended) {
                     is_game_ended = false;
                     is_menu_open = true;
-                    return;
+                    break;
                 }
                 if(is_waiting){
                     is_waiting = false;
@@ -81,10 +84,11 @@ void GameAnimation::processEvents(){
                         if(info_bounds.contains(mouse)) {
                             is_show_info_open = true;
                         }
-
+                        break;
                     }
                     else if(is_first_menu_open && is_show_info_open) {
                         is_show_info_open = false;
+                        break;
                     }
                     else {
                         if(choosing_been_bot_and_player) {
@@ -101,37 +105,47 @@ void GameAnimation::processEvents(){
                                 choosing_been_bot_and_player = false;
                                 choosing_bot_difficulty = true;
                             }
+                            break;
                         }
                         if(choosing_bot_difficulty) {
                             sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
                             sf::FloatRect easy = sf::FloatRect(330, 325, 70, 50);
                             sf::FloatRect normal = sf::FloatRect(410, 325, 70, 50);
                             sf::FloatRect hard = sf::FloatRect (490, 325, 70, 50);
-                            if(easy.contains(mouse)) {
-                                gameLogic.player2 = Bot_src.player_weak;
-                                choosing_bot_difficulty = false;
-                                is_menu_open = false;
-                            }
-                            if(normal.contains(mouse)) {
-                                gameLogic.player2 = Bot_src.player_normal;
-                                choosing_bot_difficulty = false;
-                                is_menu_open = false;
-                            }
-                            if(hard.contains(mouse)) {
-                                gameLogic.player2 = Bot_src.player_hard;
-                                choosing_bot_difficulty = false;
-                                is_menu_open = false;
-                            }
-                            //после этого мб стоит сделать выбор колоды самому игроку, пока не делал
+                            if(easy.contains(mouse)) gameLogic.player2 = Bot_src.player_weak;
+                            else if(normal.contains(mouse)) gameLogic.player2 = Bot_src.player_normal;
+                            else if(hard.contains(mouse)) gameLogic.player2 = Bot_src.player_hard;
+                            choosing_bot_difficulty = false;
+                            choosing_decks = 1;
+                            break;
                         }
                         if(choosing_decks) {
-                            //здесь надо выбрать колоды игрокам, пока не делал
-                            gameLogic.player1 = Player(Player_src.deck_1, 0);
-                            choosing_decks = false;
-                            is_menu_open = false;
+                            sf::Vector2f mouse = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                            sf::FloatRect d1 = sf::FloatRect(330, 325, 70, 50);
+                            sf::FloatRect d2 = sf::FloatRect(410, 325, 70, 50);
+                            sf::FloatRect d3 = sf::FloatRect (490, 325, 70, 50);
+                            if(choosing_decks == 1) {
+                                if (d1.contains(mouse)) gameLogic.player1 = Player(Player_src.deck_1, 0);
+                                else if (d2.contains(mouse)) gameLogic.player1 = Player(Player_src.deck_2, 0);
+                                else if (d3.contains(mouse)) gameLogic.player1 = Player(Player_src.deck_3, 0);
+                                if(gameLogic.player2.is_bot) {
+                                    choosing_decks = 0;
+                                    is_menu_open = false;
+                                }
+                                else choosing_decks = 2;
+                                break;
+                            }
+                            if(choosing_decks == 2) {
+                                if (d1.contains(mouse)) gameLogic.player2 = Player(Player_src.deck_1, 0);
+                                else if (d2.contains(mouse)) gameLogic.player2 = Player(Player_src.deck_2, 0);
+                                else if (d3.contains(mouse)) gameLogic.player2 = Player(Player_src.deck_3, 0);
+                                choosing_decks = 0;
+                                is_menu_open = false;
+                                break;
+                            }
                         }
                     }
-                    return;
+                    break;
                 }
                 bool moving = gameLogic.is_first_moving;
                 for(size_t i=0;i<clickSprites.size()-1;++i){
@@ -150,8 +164,7 @@ void GameAnimation::processEvents(){
                     gameLogic.now_moving().has_fold = true;
                     gameLogic.switch_turn();
                 }
-
-                if(gameLogic.is_first_moving != moving) is_waiting = true;
+                if(gameLogic.is_first_moving != moving && !gameLogic.now_moving().is_bot) is_waiting = true;
                 break;
             }
                 /*case sf::Event::KeyPressed:{
@@ -266,7 +279,27 @@ void GameAnimation::render(){
                 window.draw(Hard_dif);
             }
             if(choosing_decks) {
-                //выбор колод
+                sf::Sprite deck1(textureHolder.get("deck1"));
+                sf::Sprite deck2(textureHolder.get("deck2"));
+                sf::Sprite deck3(textureHolder.get("deck3"));
+                sf::Vector2f targetSizest(70.0f, 50.0f);
+
+                deck1.setPosition(330, 325);
+                deck2.setPosition(410, 325);
+                deck3.setPosition(490, 325);
+
+                deck1.setScale(
+                        targetSizest.x / deck1.getLocalBounds().width,
+                        targetSizest.y / deck1.getLocalBounds().height);
+                deck2.setScale(
+                        targetSizest.x / deck2.getLocalBounds().width,
+                        targetSizest.y / deck2.getLocalBounds().height);
+                deck3.setScale(
+                        targetSizest.x / deck3.getLocalBounds().width,
+                        targetSizest.y / deck3.getLocalBounds().height);
+                window.draw(deck1);
+                window.draw(deck2);
+                window.draw(deck3);
             }
             if(is_game_ended) {
                 sf::Vector2f targetSize(900.0f, 700.0f);
@@ -289,10 +322,14 @@ void GameAnimation::render(){
         window.display();
         return;
     }
+    if (gameLogic.now_moving().is_bot) {
+        Bot_logic().bot_move(gameLogic);
+        return;
+    }
+    Player& curPlayer = gameLogic.now_moving();
     sf::Sprite deskSprite(textureHolder.get("Game_Table"));
     //deskSprite.setScale(window.getSize().x/deskSprite.getLocalBounds().width, 6.0/7.0*window.getSize().y/deskSprite.getLocalBounds().height);
     window.draw(deskSprite);
-    Player& curPlayer = gameLogic.now_moving();
     Player& otherPlayer = gameLogic.not_now_moving();
     clickSprites.clear();
     show_line_of_cards(curPlayer.hand, 0, 700, 600, true);
@@ -340,7 +377,7 @@ void GameAnimation::render(){
 
     sf::Text hp1;
     hp1.setFont(font);
-    hp1.setString(std::to_string(gameLogic.now_moving().sum_strength));
+    hp1.setString(std::to_string(gameLogic.now_moving().hp));
     hp1.setStyle(sf::Text::Style::Bold);
     hp1.setCharacterSize(40);
     hp1.setFillColor(sf::Color::Yellow);
@@ -349,7 +386,7 @@ void GameAnimation::render(){
 
     sf::Text hp2;
     hp2.setFont(font);
-    hp2.setString(std::to_string(gameLogic.not_now_moving().sum_strength));
+    hp2.setString(std::to_string(gameLogic.not_now_moving().hp));
     hp2.setStyle(sf::Text::Style::Bold);
     hp2.setCharacterSize(40);
     hp2.setFillColor(sf::Color::Yellow);

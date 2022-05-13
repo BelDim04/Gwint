@@ -4,9 +4,6 @@
 
 class Player_deck_src {
 private:
-    std::vector<Card*> deck_2;
-    std::vector<Card*> deck_3;
-    std::vector<Card*> empty;
     void declare_deck_1() {//то же самое что нормальная сложность бота
         //pushing weather
         deck_1.push_back(src.get_Cold());
@@ -119,17 +116,15 @@ private:
     }
 public:
     Src src = Src();
-    Player player1 = Player(empty, 0);
-    Player player2 = Player(empty, 0);
-    Player player3 = Player(empty, 0);
+
+    std::vector<Card*> deck_1;
+    std::vector<Card*> deck_2;
+    std::vector<Card*> deck_3;
+    std::vector<Card*> empty;
+
     Player_deck_src() {
         declare_deck_1();
         declare_deck_2();
         declare_deck_3();
-        player1 = Player(deck_1, 0);
-        player2 = Player(deck_2, 0);
-        player3 = Player(deck_3, 0);
     }
-
-    std::vector<Card*> deck_1;
 };

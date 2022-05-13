@@ -7,6 +7,7 @@
 #include<filesystem>
 #include "Bot_decks.h"
 #include"Player_decks.h"
+#include "Bot_Logic.h"
 
 class TextureHolder{
 public:
@@ -38,7 +39,7 @@ public:
     bool is_show_info_open = false;
     bool choosing_been_bot_and_player = false;
     bool choosing_bot_difficulty = false;
-    bool choosing_decks = false;
+    int choosing_decks = 0;
     bool is_game_ended = false;
 
 
