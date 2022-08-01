@@ -7,6 +7,7 @@
 #include<filesystem>
 #include "Bot_decks.h"
 #include"Player_decks.h"
+#include "Bot_Logic.h"
 
 class TextureHolder{
 public:
@@ -38,7 +39,7 @@ public:
     bool is_show_info_open = false;
     bool choosing_been_bot_and_player = false;
     bool choosing_bot_difficulty = false;
-    bool choosing_decks = false;
+    int choosing_decks = 0;
     bool is_game_ended = false;
 
 
@@ -55,5 +56,5 @@ public:
 
     void render();
 
-    void show_line_of_cards(const std::vector<Card*>& cards, size_t start_x, size_t end_x, size_t y, bool clickable);
+    void show_line_of_cards(const std::vector<std::shared_ptr<Card>>& cards, size_t start_x, size_t end_x, size_t y, bool clickable);
 };

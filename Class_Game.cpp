@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <time.h>
 
-Player::Player(std::vector<Card*> cards, bool is_bot) : is_bot(is_bot) {
+Player::Player(std::vector<std::shared_ptr<Card>> cards, bool is_bot) : is_bot(is_bot) {
     if(!cards.empty()) {
         srand(time(0));
         for(int i = 0; i < cards.size(); ++i) {
@@ -23,24 +23,45 @@ Player::Player(std::vector<Card*> cards, bool is_bot) : is_bot(is_bot) {
 }
 
 void Player::clear() {
-    reset.insert(reset.end(), desk.buff_archer.begin(), desk.buff_archer.end());
+    sum_strength = 0;
+    melee_sum_strength = 0;
+    archer_sum_strength = 0;
+    siege_sum_strength = 0;
+    drop.insert(drop.end(), desk.buff_archer.begin(), desk.buff_archer.end());
     desk.buff_archer.clear();
-    reset.insert(reset.end(), desk.buff_melee.begin(), desk.buff_melee.end());
+    drop.insert(drop.end(), desk.buff_melee.begin(), desk.buff_melee.end());
     desk.buff_melee.clear();
-    reset.insert(reset.end(), desk.buff_siege.begin(), desk.buff_siege.end());
+    drop.insert(drop.end(), desk.buff_siege.begin(), desk.buff_siege.end());
     desk.buff_siege.clear();
-    reset.insert(reset.end(), desk.strength_melee.begin(), desk.strength_melee.end());
+    drop.insert(drop.end(), desk.strength_melee.begin(), desk.strength_melee.end());
     desk.strength_melee.clear();
-    reset.insert(reset.end(), desk.strength_archer.begin(), desk.strength_archer.end());
+    drop.insert(drop.end(), desk.strength_archer.begin(), desk.strength_archer.end());
     desk.strength_archer.clear();
-    reset.insert(reset.end(), desk.strength_siege.begin(), desk.strength_siege.end());
+    drop.insert(drop.end(), desk.strength_siege.begin(), desk.strength_siege.end());
     desk.strength_siege.clear();
-};
+}
+
+void Player::reset() {
+    hand.clear();
+    deck.clear();
+    drop.clear();
+    hp = 2;
+    is_bot = false;
+}
+
+Player::Player() = default;
 
 Weather_manager::Weather_manager() {
     weather = {};
     is_weather_bad_melee = false;
     is_weather_bad_archer = false;
+    is_weather_bad_siege = false;
+}
+
+void Weather_manager::clear() {
+    weather.clear();
+    is_weather_bad_archer = false;
+    is_weather_bad_melee = false;
     is_weather_bad_siege = false;
 }
 
@@ -75,7 +96,7 @@ std::string Game::str_not_now_moving() {
     return "player1";
 }
 
-std::vector<Card*>& Game::find_vector(std::string where_lies) {
+std::vector<std::shared_ptr<Card>>& Game::find_vector(std::string where_lies) {
     if (where_lies == "player1_melee") return player1.desk.strength_melee;
     if (where_lies == "player1_archer") return player1.desk.strength_archer;
     if (where_lies == "player1_siege") return player1.desk.strength_siege;
@@ -127,7 +148,7 @@ void Game::recalculate() {
     }
 }
 
-std::vector<Card*>& Game::find_weather() {
+std::vector<std::shared_ptr<Card>>& Game::find_weather() {
     return weather_manager.weather;
 }
 
@@ -186,7 +207,7 @@ size_t Game::choose_card() {
 }
 
 void Game::move_card(size_t card_index, std::string destination) {
-    Card* card = now_moving().hand[card_index];
+    std::shared_ptr<Card> card = now_moving().hand[card_index];
     now_moving().hand.erase(now_moving().hand.begin() + card_index);
     if (destination == "player1_buff_melee") player1.desk.buff_melee.push_back(card);
     else if (destination == "player1_buff_archer") player1.desk.buff_archer.push_back(card);
@@ -205,8 +226,8 @@ void Game::move_card(size_t card_index, std::string destination) {
 }
 
 void Game::spy_move(int a, int b) {
-    Card* mv_f = now_moving().deck[a];
-    Card* mv_s = now_moving().deck[b];
+    std::shared_ptr<Card> mv_f = now_moving().deck[a];
+    std::shared_ptr<Card> mv_s = now_moving().deck[b];
     if (a > b) {
         now_moving().deck.erase(now_moving().deck.begin() + a);
         now_moving().deck.erase(now_moving().deck.begin() + b);
@@ -221,8 +242,8 @@ void Game::spy_move(int a, int b) {
 }
 
 void Game::healing_move(int a) {
-    Card* mv = now_moving().reset[a];
-    now_moving().reset.erase(now_moving().reset.begin() + a);
+    std::shared_ptr<Card> mv = now_moving().drop[a];
+    now_moving().drop.erase(now_moving().drop.begin() + a);
     now_moving().hand.push_back(mv);
     //анимация переноса
 }
@@ -282,8 +303,13 @@ void Game::on_round_ended() {
     player2.desk.buff_manager.buff_in_two_archer = 1;
     player2.desk.buff_manager.buff_in_two_melee = 1;
     player2.desk.buff_manager.buff_in_two_siege = 1;
+    weather_manager.clear();
 }
 
 void Game::on_game_ended() {
-
+    on_round_ended();
+    player1.reset();
+    player2.reset();
 }
+
+Game::Game(bool is_first_moving): is_first_moving(is_first_moving), is_first_start_round(is_first_moving){};

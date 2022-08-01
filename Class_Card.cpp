@@ -5,7 +5,7 @@
 #include "Class_Card.h"
 #include "Class_Game.h"
 
-void deletefunction(Game& game, Card* card) {
+void deletefunction(Game& game, std::shared_ptr<Card> card) {
     int n = game.find_vector(card->where_lies).size();
     for(int i = 0; i < n; ++i) {
         if(game.find_vector(card->where_lies)[i]->name == card->name) {
@@ -93,7 +93,7 @@ void Usual_card::bot_set_where_lies(Game &game) {
 }
 
 void Usual_card::delete_card(Game &game) {
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
 }
 
 Spy_card::Spy_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
@@ -111,7 +111,7 @@ void Spy_card::bot_set_where_lies(Game &game) {
 
 void Spy_card::use_special_ability(Game& game){
     //рандомно выбрать карты из колоды и добавить в руку
-    std::vector<Card*>& deck = game.now_moving().deck;
+    std::vector<std::shared_ptr<Card>>& deck = game.now_moving().deck;
     if(deck.size() == 0) return;
     int a = rand() % deck.size();
     int b = rand() % deck.size();
@@ -121,7 +121,7 @@ void Spy_card::use_special_ability(Game& game){
 }
 
 void Spy_card::delete_card(Game &game) {
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
 }
 
 Delete_card::Delete_card(int Amount_of_strength, bool Can_be_changed, std::string Name, std::string Filename_of_image,
@@ -177,7 +177,7 @@ void Delete_card::use_special_ability(Game &game) {
 }
 
 void Delete_card::delete_card(Game &game) {
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
 }
 
 Healing_card::Healing_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
@@ -196,7 +196,7 @@ void Healing_card::bot_set_where_lies(Game &game) {
 
 void Healing_card::use_special_ability(Game& game) {
     //рандомно выбрать карту из сброса и добавить в руку
-    std::vector<Card*>& reset = game.now_moving().reset;
+    std::vector<std::shared_ptr<Card>>& reset = game.now_moving().drop;
     if (reset.size()) {
         int a = rand() % reset.size();
         game.healing_move(a);
@@ -204,7 +204,7 @@ void Healing_card::use_special_ability(Game& game) {
 }
 
 void Healing_card::delete_card(Game &game) {
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
 }
 
 One_increase_card::One_increase_card(int Amount_of_strength, bool Can_be_changed, std::string Name,
@@ -226,7 +226,7 @@ void One_increase_card::use_special_ability(Game& game) {
 }
 
 void One_increase_card::delete_card(Game &game) {
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
     std::pair<int&, int&> buffers = game.find_buffer(where_lies);
     buffers.first -= 1;
 }
@@ -251,7 +251,7 @@ void Double_increase_card::use_special_ability(Game& game) {
 }
 
 void Double_increase_card::delete_card(Game &game) {
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
     std::pair<int&, int&> buffers = game.find_buffer(where_lies);
     buffers.second /= 1;
 }
@@ -292,7 +292,7 @@ void Cold_card::bot_set_where_lies(Game &game) {
 void Cold_card::delete_card(Game &game) {
     bool& is_weather_bad = game.find_weather_buffer("Cold");
     is_weather_bad = false;
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
 }
 
 Rain_card::Rain_card(std::string Filename_of_image) : Weather_card("Rain", Filename_of_image) {};
@@ -312,7 +312,7 @@ void Rain_card::bot_set_where_lies(Game &game) {
 void Rain_card::delete_card(Game &game) {
     bool& is_weather_bad = game.find_weather_buffer("Rain");
     is_weather_bad = false;
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
 }
 
 Haze_card::Haze_card(std::string Filename_of_image) : Weather_card("Haze", Filename_of_image) {};
@@ -332,7 +332,7 @@ void Haze_card::bot_set_where_lies(Game &game) {
 void Haze_card::delete_card(Game &game) {
     bool& is_weather_bad = game.find_weather_buffer("Haze");
     is_weather_bad = false;
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
 }
 
 Good_weather_card::Good_weather_card(std::string Filename_of_image) : Weather_card("Bright Day", Filename_of_image) {};
@@ -393,5 +393,5 @@ void Double_buff_card::bot_set_where_lies(Game& game) {
 }
 
 void Double_buff_card::delete_card(Game &game) {
-    deletefunction(game, this);
+    deletefunction(game, std::shared_ptr<Card>(this));
 }

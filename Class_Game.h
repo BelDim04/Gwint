@@ -1,6 +1,7 @@
 #pragma once
 #include<iostream>
 #include<vector>
+#include<memory>
 
 class Card;
 
@@ -16,12 +17,12 @@ public:
 
 class Desk {
 public:
-    std::vector<Card*> buff_melee;
-    std::vector<Card*> buff_archer;
-    std::vector<Card*> buff_siege;
-    std::vector<Card*> strength_melee;
-    std::vector<Card*> strength_archer;
-    std::vector<Card*> strength_siege;
+    std::vector<std::shared_ptr<Card>> buff_melee;
+    std::vector<std::shared_ptr<Card>> buff_archer;
+    std::vector<std::shared_ptr<Card>> buff_siege;
+    std::vector<std::shared_ptr<Card>> strength_melee;
+    std::vector<std::shared_ptr<Card>> strength_archer;
+    std::vector<std::shared_ptr<Card>> strength_siege;
     Buff_manager buff_manager;
 };
 
@@ -29,11 +30,11 @@ public:
 class Player {
 public:
     static const size_t amount_in_hand = 6;
-    std::vector<Card*> hand;
-    std::vector<Card*> reset;
-    std::vector<Card*> deck;
+    std::vector<std::shared_ptr<Card>> hand;
+    std::vector<std::shared_ptr<Card>> drop;
+    std::vector<std::shared_ptr<Card>> deck;
     Desk desk;
-     bool is_bot;
+    bool is_bot;
     //type_of_fraction
     int sum_strength = 0;
     int melee_sum_strength = 0;
@@ -41,28 +42,55 @@ public:
     int siege_sum_strength = 0;
     bool has_fold = false;
     int hp = 2;
-    Player(std::vector<Card*> cards, bool is_bot);
+    Player(std::vector<std::shared_ptr<Card>> cards, bool is_bot);
+    Player();
     Player& operator=(Player p2) {
         hand.clear();
         deck.clear();
+        desk.strength_archer.clear();
+        desk.strength_melee.clear();
+        desk.strength_siege.clear();
+        desk.buff_archer.clear();
+        desk.buff_melee.clear();
+        desk.buff_siege.clear();
+        is_bot = p2.is_bot;
         for(int i = 0; i < p2.hand.size(); ++i) {
             hand.push_back(p2.hand[i]);
         }
         for(int i = 0; i < p2.deck.size(); ++i) {
             deck.push_back(p2.deck[i]);
         }
-        return *this;
+        for(int i = 0; i < p2.desk.strength_archer.size(); ++i) {
+            desk.strength_archer.push_back(p2.desk.strength_archer[i]);
+        }
+        for(int i = 0; i < p2.desk.strength_melee.size(); ++i) {
+            desk.strength_melee.push_back(p2.desk.strength_melee[i]);
+        }
+        for(int i = 0; i < p2.desk.strength_archer.size(); ++i) {
+            desk.strength_siege.push_back(p2.desk.strength_siege[i]);
+        }
+        for(int i = 0; i < p2.desk.buff_archer.size(); ++i) {
+            desk.buff_archer.push_back(p2.desk.buff_archer[i]);
+        }
+        for(int i = 0; i < p2.desk.buff_melee.size(); ++i) {
+            desk.buff_melee.push_back(p2.desk.buff_melee[i]);
+        }
+        for(int i = 0; i < p2.desk.buff_archer.size(); ++i) {
+            desk.buff_siege.push_back(p2.desk.buff_siege[i]);
+        }
     }
     void clear();
+    void reset();
 };
 
 class Weather_manager {
 public:
-    std::vector<Card*> weather;
+    std::vector<std::shared_ptr<Card>> weather;
     bool is_weather_bad_melee;
     bool is_weather_bad_archer;
     bool is_weather_bad_siege;
     Weather_manager();
+    void clear();
 };
 
 class Game {
@@ -74,6 +102,7 @@ public:
     Weather_manager weather_manager;
 
     Game(Player p1, Player p2, bool is_first_moving);
+    Game(bool is_first_moving);
 
     bool is_game_ended();
     void switch_turn();
@@ -82,10 +111,10 @@ public:
     Player& not_now_moving();
     std::string str_not_now_moving();
 
-    std::vector<Card*>& find_vector(std::string where_lies);
+    std::vector<std::shared_ptr<Card>>& find_vector(std::string where_lies);
     void recalculate();
 
-    std::vector<Card*>& find_weather();
+    std::vector<std::shared_ptr<Card>>& find_weather();
 
     bool is_weather_bad(std::string where_lies);
 
